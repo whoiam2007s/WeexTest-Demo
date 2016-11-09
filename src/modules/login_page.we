@@ -1,0 +1,117 @@
+<template>
+  <div class="content" >
+
+    <login-nav title=""></login-nav>
+
+    <div style="position:absolute;top:0;right:0;left:0;bottom:0;width:750px;padding-top:89px;padding-left:80px;padding-right:80px;text-align:center;align-items:center;">
+      <image style="width:320px;height:86px;margin-top:144px;margin-bottom:68px;" src="{{icons.logo_2}}"></image>
+      <input-login id="phone" type="tel" kind="phone" placeholder="请输入手机号"></input-login>
+      <input-login id="password" type="password" kind="lock" placeholder="请输入密码"></input-login>
+      <text class="btn" onclick="onLoginClick">登陆</text>
+
+      <div style="position:absolute;bottom:32px;">
+        <text style="font-size:24px;text-align:center;color:#5a6d83;" onclick="onForgetClick">忘记密码？</text>
+      </div>
+
+    </div>
+
+    <alert id="alert"></alert>
+
+  </div>
+</template>
+
+<style>
+  .content{
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    background:#313842;
+  }
+  .btn{
+    font-size:28px;
+    width:590px;
+    height:92px;
+    line-height:92px;
+    color:#9cc3eb;
+    background:#2b2f38;
+    text-align:center;
+    margin-top:42px;
+  }
+</style>
+
+<script>
+  require('../common/login-nav.we');
+  require('../modals/input-login.we');
+  require('../modals/alert.we');
+
+  var resource = require('../common/resource');
+  var navigator = require('@weex-module/navigator');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      icons:{
+        logo_2:resource.images.login_logo_2,
+      },
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for(let key in this.icons){
+        this.icons[key] = this.baseURL + this.icons[key];
+      }
+
+      this.$on('loginNav.onBackClick', function(e){
+        e.stop();
+        let params = {
+          animated:true,
+        };
+        navigator.pop(params);
+      });
+    },
+    methods: {
+      onLoginClick:function(){
+        let phone = this.$vm('phone').val;
+        let password = this.$vm('password').val;
+        let $alert = this.$vm('alert');
+        if(!resource.isPhone(phone)){
+          $alert.show({
+            content: '请填写正确的手机号码',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!password){
+          $alert.show({
+            content: '请填写密码',
+            title: '提示'
+          });
+          return false;
+        }
+        if(password == '123456'){
+          this.loginSuc();
+        }else{
+          $alert.show({
+            content: '账号密码不正确！',
+            title: '提示'
+          });
+        }
+      },
+      onForgetClick:function(){
+        let url = resource.getPageUrl(this.$getConfig(), 'modules/forget_pw.js');
+        this.$openURL(url);
+      },
+      loginSuc:function(){
+        let text = '恭喜您，登陆成功！';
+        let url = 'modules/main.js';
+        let link = resource.getPageUrl(this.$getConfig(), 'modules/login_rst.js?text='+text+'&url='+url);
+        this.$openURL(link);
+
+        let storage = require('@weex-module/storage');
+        storage.setItem('is_user_login', 1);
+      },
+    }
+  }
+</script>

@@ -1,0 +1,61 @@
+<template>
+  <div class="content">
+    <div class="circle">
+      <div class="circle-row">
+        <text style="font-size:90px;height:90px;color:#444;font-weight:bold;">{{num}}</text>
+        <text style="font-size:36px;height:40px;color:#444;">{{unit}}</text>
+      </div>
+      <text style="padding-top:20px;color:#ff801a;font-size:30px;">{{title}}</text>
+    </div>
+    <div class="title" if="{{is_title_show}}">
+      <text style="margin-right:25px;">累计:{{total}}人</text>
+      <text style="margin-left:25px;">{{sign}}人注册APP</text>
+    </div>
+  </div>
+</template>
+
+<style>
+  .content{
+    width:750px;
+    padding-top:20px;
+    padding-bottom:20px;
+    align-items:center;
+  }
+  .circle{
+    width:270px;
+    height:270px;
+    border-radius:135px;
+    border:8px solid #f1f5f8;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+  }
+  .circle-row{
+    flex-direction:row;
+    justify-content:center;
+    align-items:flex-end;
+  }
+  .title{
+    padding-top:20px;
+    padding-bottom:25px;
+    font-size:30px;
+    color:#999;
+    flex-direction:row;
+    justify-content:center;
+    align-items:center;
+  }
+</style>
+
+<script>
+  module.exports = {
+    data: {
+      is_title_show:true,
+      num:'',
+      unit:'',
+      title:'',
+      total:'',
+      sign:'',
+    },
+    methods: {}
+  }
+</script>

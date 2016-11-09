@@ -1,0 +1,75 @@
+<template>
+  <div if="{{is_show}}" class="content">
+    <div class="box">
+      <text class="title">{{title}}</text>
+      <text class="cnt">{{content}}</text>
+      <text class="close" onclick="onCloseClick">关闭</text>
+    </div>
+  </div>
+</template>
+
+<style>
+  .content{
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    right:0;
+    background-color:rgba(0,0,0,.6);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+  }
+  .box{
+    width:580px;
+    background:#FFF;
+  }
+  .title{
+    font-size:36px;
+    color:#333;
+    padding-top:50px;
+    padding-bottom:20px;
+    align-items:center;
+  }
+  .cnt{
+    font-size:32px;
+    color:#999;
+    line-height:42px;
+    padding-left:40px;
+    padding-right:40px;
+    padding-bottom:40px;
+  }
+  .close{
+    height:88px;
+    font-size:32px;
+    color:#1d8fe1;
+    background:#f6f9fb;
+    border-top:1px solid #eee;
+    justify-content:center;
+    align-items:center;
+  }
+
+</style>
+
+<script>
+  module.exports = {
+    data: {
+      is_show:false,
+      title:'提示',
+      content:'内容',
+      callback:function(){},
+    },
+    methods: {
+      show:function(config){
+        if(config.title){this.title = config.title;}
+        if(config.content){this.content = config.content;}
+        if(config.callback){this.callback = config.callback;}
+        this.is_show = true;
+      },
+      onCloseClick:function(e){
+        this.is_show = false;
+        this.callback();
+      }
+    }
+  }
+</script>

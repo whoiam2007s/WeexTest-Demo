@@ -1,0 +1,35 @@
+<template>
+  <div class="blks" style="height:{{height}}">
+    <blk-links-item repeat="{{link_items}}" src="{{icon}}" title="{{title}}" size="{{size}}" id="id" url="{{url}}" index="{{$index}}"></blk-links-item>
+  </div>
+</template>
+
+<style>
+  .blks{
+  }
+
+</style>
+
+<script>
+  var b_h = 187.5;
+
+  module.exports = {
+    data: {
+      link_items:[],
+      size:1,
+      height:0
+    },
+    created:function(){
+      switch(this.size){
+        case 1:
+            b_h = 187.5;
+          break;
+        default:;
+      }
+      this.height = b_h * Math.ceil(this.link_items.length/4);
+    },
+    methods: {
+
+    }
+  }
+</script>

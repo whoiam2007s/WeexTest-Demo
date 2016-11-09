@@ -1,0 +1,68 @@
+<template>
+  <div class="content">
+    <image style="position:absolute;left:0;top:0;width:60px;height:1000px;" src="{{icons.line}}"></image>
+    <div style="flex-direction:row;justify-content:space-between;padding-top:40px;padding-bottom:40px;padding-left:30px;padding-right:30px;width:750px;z-index:10;">
+      <div class="left" style="border:1px solid {{type==0?'#c8c8c8':'#1d8fe1'}};background-color:{{type==0?'#FFF':'#1d8fe1'}};"></div>
+      <div class="right">
+        <image style="position:absolute;left:-10px;top:0;width:30px;height:50px;" src="{{icons.arrow}}"></image>
+        <text style="font-size:26px;line-height:36px;color:{{type==0?'#666':'#1d8fe1'}};margin-bottom:10px;">{{content}}</text>
+        <div style="flex-direction:row;align-items:center;">
+          <text style="font-size:22px;color:#c8c8c8;margin-right:20px;">{{addTime}}</text>
+          <image style="width:26px;height:26px;" src="{{icons.del}}" onclick="onDelClick"></image>
+        </div>
+      </div>
+    </div>
+   </div>
+</template>
+
+<style>
+  .content{
+    overflow:hidden;
+  }
+  .left{
+    width:20px;
+    height:20px;
+    margin-top:10px;
+    margin-left:10px;
+    border-radius:10px;
+  }
+  .right{
+    width:630px;
+    background-color:#FFF;
+    padding:30px;
+  }
+</style>
+
+<script>
+  var resource = require('../common/resource');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      type:0,
+      content:'',
+      addTime:'',
+      remarkId:'',
+      icons:{
+          del:resource.icons.apply_delete,
+          arrow:resource.icons.apply_arrow_left,
+          line:resource.icons.apply_line,
+      },
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+    },
+    methods: {
+      onDelClick:function(){
+        let params = {
+          remarkId:this.remarkId,
+        };
+        this.$dispatch('applyRemarksBlk.onDelClick', params);
+      }
+    }
+  }
+</script>

@@ -1,0 +1,146 @@
+<template>
+  <!--onswipe="onSwipe"-->
+  <div class="content" style="background-color:{{del_flag?'#eee':'#fff'}};" onpanstart="onPanStart" onpanmove="onPanMove" onpanend="onPanEnd" >
+    <image if="{{!del_flag}}" style="position:absolute;opacity:{{1-move_precent}};left:{{move_precent*45+30}}px;top:{{move_precent*45+30}}px;width:{{(1-move_precent)*90}}px;height:{{(1-move_precent)*90}}px;margin-right:{{(1-move_precent)*10}}px;" src="{{userFace}}"></image>
+    <div class="info" style="position:absolute;left:{{(1-move_precent)*110+30}}px;top:30px;border-right:{{del_flag?'0':'1px solid #eee'}};">
+      <div style="height:60px;flex-direction:row;align-items:center;justify-content:flex-start;">
+        <text style="font-size:30px;color:#4e7591;margin-right:10px;">{{userName}}</text>
+        <text if="{{userId != 0}}" style="font-size:20px;color:#FFF;background:#17af69;padding:5px;">已注册</text>
+        <text if="{{userId == 0}}" style="font-size:20px;color:#FFF;background:#ccc;padding:5px;">未注册</text>
+      </div>
+      <div>
+        <text style="font-size:24px;line-height:30px;color:#999;">{{addTime}}</text>
+      </div>
+    </div>
+    <image if="{{!del_flag}}" style="position:absolute;opacity:{{1-move_precent}};top:{{move_precent*50+25}}px;right:{{move_precent*50+160}}px;width:{{(1-move_precent)*100}}px;height:{{(1-move_precent)*100}}px;" src="{{edit}}" type="edit" normal="{{icons_beizhu}}" selected="{{icons_beizhu_selected}}" onclick="onEditClick" ontouchstart="onBtnTouchStart" ontouchend="onBtnTouchEnd" ></image>
+    <image if="{{!del_flag}}" style="position:absolute;opacity:{{1-move_precent}};top:{{move_precent*50+25}}px;right:{{move_precent*50+30}}px;width:{{(1-move_precent)*100}}px;height:{{(1-move_precent)*100}}px;" src="{{phone}}" type="phone" normal="{{intent_phone}}" selected="{{intent_phone_selected}}" onclick="onPhoneClick" ontouchstart="onBtnTouchStart" ontouchend="onBtnTouchEnd" ></image>
+    <text style="position:absolute;opacity:{{move_precent}};top:0;right:{{(1-move_precent)*-150}};width:150px;height:150px;color:#FFF;background:#1d8fe1;justify-content:center;align-items:center;" onclick="onDelClick">删除</text>
+    <div class="line"></div>
+  </div>
+</template>
+
+<style>
+  .content{
+    height:150px;
+    width:750px;
+    flex-direction:row;
+    align-items:center;
+  }
+  .info{
+    width:345px;
+  }
+  .line{
+    position:absolute;
+    left:30px;
+    bottom:0;
+    width:690px;
+    height:1px;
+    background:#eee;
+  }
+
+</style>
+
+<script>
+
+  var resource = require('../common/resource');
+  var navigator = require('@weex-module/navigator');
+
+  module.exports = {
+    data: {
+      customerId:'',
+      userId:'',
+      userName:'',
+      userFace:'',
+      userTel:'',
+      addTime:'',
+      edit:'',
+      phone:'',
+      type:0,
+      icons_beizhu:resource.icons.intent_beizhu,
+      icons_beizhu_selected:resource.icons.intent_beizhu_selected,
+      intent_phone:resource.icons.intent_phone,
+      intent_phone_selected:resource.icons.intent_phone_selected,
+      del_flag:false,
+      move_precent:0,
+      move_x_def:0,
+      move_x_cur:0,
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      this.icons_beizhu = this.baseURL + this.icons_beizhu;
+      this.icons_beizhu_selected = this.baseURL + this.icons_beizhu_selected;
+      this.intent_phone = this.baseURL + this.intent_phone;
+      this.intent_phone_selected = this.baseURL + this.intent_phone_selected;
+
+      this.edit = this.icons_beizhu;
+      this.phone = this.intent_phone;
+    },
+    methods: {
+      onBtnTouchStart:function(e){
+        let type = e.target.attr.type;
+        let selected = e.target.attr.selected;
+        this[type] = selected;
+      },
+      onBtnTouchEnd:function(e){
+        let type = e.target.attr.type;
+        let normal = e.target.attr.normal;
+        this[type] = normal;
+      },
+      onDelClick:function(e){
+        let params = {
+          customerId:this.customerId,
+          type:this.type,
+          index:this.customerId,
+        };
+        this.$dispatch('listItem.onDelClick', params);
+      },
+      onPanStart:function(e){
+        this.del_flag = false;
+        this.move_x_def = e.touches[0].clientX;
+      },
+      onPanMove:function(e){
+        let x = e.touches[0].clientX;
+        let move = x-this.move_x_def;
+        let pre = move/150;
+        if(e.direction == 'left'){
+          if(this.move_precent == 1){return true;}
+          pre *= -1;
+          this.move_precent = (pre > 1 ? 1 : pre);
+        }else if(e.direction == 'right'){
+          if(this.move_precent == 0){return true;}
+          this.move_precent = 1-(pre > 1 ? 1 : pre);
+        }
+      },
+      onPanEnd:function(e){
+        this.move_x_def = 0;
+        if(this.move_precent < 1){
+          this.move_precent = 0;
+        }else{
+          this.move_precent = 1;
+        }
+        this.del_flag = this.move_precent != 0;
+        if(this.del_flag){
+          let params = {
+            customerId:this.customerId,
+          };
+          this.$dispatch('listItem.onDelFlagChange', params);
+        }
+      },
+      backToInit:function(){
+        this.move_precent = 0;
+        this.del_flag = false;
+      },
+      onEditClick:function(){
+        let params = {
+          url:resource.getPageUrl(this.$getConfig(), 'modules/apply-remarks.js?customerId='+this.customerId),
+          animated:true,
+        };
+        navigator.push(params);
+      },
+      onPhoneClick:function(){
+        console.log('call phone with '+this.phone);
+      },
+    }
+  }
+</script>

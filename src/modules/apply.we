@@ -1,0 +1,182 @@
+<template>
+  <div class="content">
+
+    <nav-bar is_back_show="{{false}}" title="提成申请" is_tixing_show="{{true}}" tixing_num="{{tixing_num}}" ></nav-bar>
+
+    <scroller style="height:{{deviceHeight}}px;">
+
+      <div style="height:89px;"></div>
+
+      <div class="bg-f bar-20" style="padding-top:40px">
+        <intent-top-num num="{{payNum}}" unit="人" title="本月累计招生" is_title_show="{{false}}"></intent-top-num>
+        <div style="position:absolute;top:25px;right:30px;align-items:flex-end;">
+          <date-icon></date-icon>
+        </div>
+        <div style="position:absolute;top:30px;left:30px;">
+          <text style="font-size:30px;color:#999;">当日招生：{{payNumToday}}人</text>
+        </div>
+      </div>
+
+      <div>
+
+        <tabbar-blks items="{{items}}"></tabbar-blks>
+
+        <div class="" if="{{blks_selectedIndex == 0}}">
+
+          <list-empty if="{{items[0].cashList.length == 0}}" kind="2" title="分享自己的微名片，快速赚取收入"></list-empty>
+
+          <apply-list-item repeat="{{items[0].cashList}}" type="0" orderId="{{orderId}}" userName="{{userName}}" addTime="{{addTime}}" productName="{{productName}}" productPrice="{{productPrice}}" applyMoney="{{applyMoney}}" applyState="{{applyState}}" applyStateStr="{{applyStateStr}}" ></apply-list-item>
+
+        </div>
+
+        <div class="" if="{{blks_selectedIndex == 1}}">
+
+          <list-empty if="{{items[1].cashList.length == 0}}" kind="2" title="分享自己的微名片，快速赚取收入"></list-empty>
+
+          <apply-list-item repeat="{{items[1].cashList}}" type="1" orderId="{{orderId}}" userName="{{userName}}" addTime="{{addTime}}" productName="{{productName}}" productPrice="{{productPrice}}" applyMoney="{{applyMoney}}" applyState="{{applyState}}" applyStateStr="{{applyStateStr}}" ></apply-list-item>
+
+        </div>
+
+      </div>
+
+      <div style="height:98px;"></div>
+
+    </scroller>
+
+  </div>
+
+</template>
+
+<style>
+  .content{
+    background-color:#efeff4;
+  }
+  .bg-f{background:#FFF;}
+  .bar-20{margin-bottom:20px;}
+
+</style>
+
+<script>
+  require('../common/nav-bar.we');
+  require('../common/intent-top-num.we');
+  require('../common/date-icon.we');
+  require('../common/tabbar-blks.we');
+  require('../common/list-empty.we');
+  require('../common/apply-list-item.we');
+
+  var resource = require('../common/resource');
+  var navigator = require('@weex-module/navigator');
+
+  function getInfo(data, callback){
+    let date = data.year+'-'+data.month;
+    callback({
+      payNumToday:'45',
+      payNum:'123',
+      cashList:[
+        {orderId:'1',userName:'用户名称1',productName:'产品名称1',productPrice:'3680',addTime:'2016-05-16 12:35:02',applyMoney:'100.50', applyState:'2',applyStateStr:'申请说明'},
+        {orderId:'2',userName:'用户名称2',productName:'产品名称2',productPrice:'3680',addTime:'2016-05-16 12:35:02',applyMoney:'100.50', applyState:'0',applyStateStr:'申请说明'},
+        {orderId:'3',userName:'用户名称3',productName:'产品名称3',productPrice:'3680',addTime:'2016-05-16 12:35:02',applyMoney:'100.50', applyState:'0',applyStateStr:'申请说明'},
+        {orderId:'4',userName:'用户名称4',productName:'产品名称4',productPrice:'3680',addTime:'2016-05-16 12:35:02',applyMoney:'100.50', applyState:'1',applyStateStr:'申请说明'},
+        {orderId:'5',userName:'用户名称5',productName:'产品名称5',productPrice:'3680',addTime:'2016-05-16 12:35:02',applyMoney:'100.50', applyState:'3',applyStateStr:'申请说明'},
+       ]
+    });
+  }
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      items:[
+        {
+          index:0,
+          title:'未申请',
+          color:'',
+          shadowColor:'',
+          cashList:[],
+        },
+        {
+          index:1,
+          title:'已申请',
+          color:'',
+          shadowColor:'',
+          cashList:[],
+        },
+      ],
+      tixing_num:0,
+      date:{
+        year:'2016',
+        month:'10',
+      },
+      pages:[0, 0],
+      page_size:5,
+      deviceHeight:1000,
+      payNumToday:56,
+      payNum:239,
+      blks_selectedIndex:0,
+      is_web_show:false,
+    },
+    created:function(){
+      let self = this;
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+
+      let d_h = config.env.deviceHeight;
+      this.deviceHeight = d_h;
+
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+
+      this.getData(0);
+      this.getData(1);
+
+      this.$on('navbarMsgClick', function(){
+        if(self.tixing_num > 0){
+          let params = {
+            url:resource.urls.work_msg_link,
+            animated:true,
+          };
+          navigator.push(params);
+        }
+      });
+      this.$on('tabbarBlks.onItemClick', function(e){
+        this.blks_selectedIndex = e.detail.index;
+      });
+      this.$on('dateIcon.onSureClick', function(e){
+        this.date.year = e.detail.year;
+        this.date.month = e.detail.month;
+        getInfo(this.date, function(data){
+          self.initData(0, data);
+          self.initData(1, data);
+        });
+      });
+      this.$on('applyListItem.onBtnClick', function(e){
+        let id = e.detail.id;
+
+      });
+    },
+    methods: {
+      initData:function(index, data){
+        this.payNumToday = data.payNumToday;
+        this.payNum = data.payNum;
+        this.items[index].cashList = data.cashList;
+        if(data.cashList.length <= 0){
+          this.pages[index]--;//没有返回数据时，则保持在请求页码
+        }
+      },
+      getData:function(index){
+        let self = this;
+        let state = 0;
+        if(index == 1){
+          state = 2;
+        }
+        getInfo({
+          state:state,
+          page:this.pages[index]++,
+          page_size:this.page_size,
+        }, function(data){
+          self.initData(index, data);
+        });
+      }
+    }
+  }
+</script>

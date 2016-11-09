@@ -1,0 +1,117 @@
+<template>
+  <div class="nav-bar" style="background-color:{{backgroundColor}};border-bottom:{{backgroundColor=='#FFF'?'1':'0'}}px solid #eee;">
+    <div style="flex:1;" class="nav-back">
+      <div if="{{is_back_show}}" class="nav-back" onclick="onBackClick">
+        <image style="width:48px;height:48px;" src="{{icon_back}}" ></image>
+        <text style="font-size:30px;color:#444;line-height:48px;margin-left:-10px;" >返回</text>
+      </div>
+    </div>
+    <div style="flex:1;" class="nav-title">
+      <text style="font-size:36px;color:{{backgroundColor=='#FFF'?'#444':'#FFF'}};">{{title}}</text>
+    </div>
+    <div style="flex:1;" class="nav-msg">
+      <div onclick="onMsgClick">
+        <div class="msg-tixing nav-msg" if="is_tixing_show">
+          <image style="width:48px;height:48px;margin-right:20px;" src="{{backgroundColor=='#FFF'?icon_tixing:icon_tixing2}}"></image>
+          <text class="msg-tixing-num" if="{{tixing_num > 0}}">{{tixing_num}}</text>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  .nav-bar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:750px;
+    height:88px;
+    flex-direction:row;
+    z-index:99;
+  }
+  .nav-back{
+    align-items:center;
+    justify-content:flex-start;
+    flex-direction:row;
+  }
+  .nav-msg{
+    align-items:center;
+    justify-content:flex-end;
+    flex-direction:row;
+  }
+  .nav-title{
+    justify-content:center;
+    align-items:center;
+    flex-direction:row;
+  }
+  .msg-tixing-num{
+    position:absolute;
+    top:0;
+    right:10px;
+    height:30px;
+    color:#FFF;
+    background:#e94e4d;
+    font-size:22px;
+    text-align:center;
+    border-radius:15px;
+    min-width:30px;
+    line-height:30px;
+  }
+</style>
+
+<script>
+  var resource = require('../common/resource');
+  var navigator = require('@weex-module/navigator');
+
+  function getMsg(data, callback){
+    callback(
+        Math.random() >.5?[]:[{id:data.id+1}]
+    );
+  }
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      title:'',
+      icon_back:resource.icons.back_copy,
+      icon_tixing:resource.icons.work_tixing,
+      icon_tixing2:resource.icons.work_tixing2,
+      is_back_show:false,
+      is_tixing_show:false,
+      tixing_num:0,
+      backgroundColor:'#FFF',
+    },
+    created:function(){
+      this.baseURL = resource.getBaseUrl(this.$getConfig());
+      this.icon_back = this.baseURL + this.icon_back;
+      this.icon_tixing = this.baseURL + this.icon_tixing;
+      this.icon_tixing2 = this.baseURL + this.icon_tixing2;
+
+      let self = this;
+      let storage = require('@weex-module/storage');
+      storage.getItem('msg_max_id', function(e){
+        let tx_max_id = e.result && e.data ? e.data : 0;
+        getMsg({id:tx_max_id}, function(data){
+          self.tixing_num = data.length;
+        })
+      });
+
+    },
+    methods: {
+      onBackClick:function(e){
+        let params = {
+          animated:true,
+        };
+        navigator.pop(params);
+      },
+      onMsgClick:function(){
+        let params = {
+          url:resource.getPageUrl(this.$getConfig(), 'modules/sysmsg.js'),
+          animated:true,
+        };
+        navigator.push(params);
+      }
+    }
+  }
+</script>

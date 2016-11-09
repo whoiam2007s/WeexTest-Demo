@@ -1,0 +1,82 @@
+<template>
+  <div class="content" onclick="onClick">
+    <image if="{{!is_checked}}" class="icon" src="{{icon_def}}"></image>
+    <image if="{{is_checked}}" class="icon" src="{{icon_sel}}"></image>
+    <text class="title">{{title}}</text>
+  </div>
+</template>
+
+<style>
+  .content{
+    flex-direction:row;
+    align-items:center;
+    height:70px;
+  }
+  .icon{
+    width:38px;
+    height:38px;
+    margin-right:10px;
+  }
+  .title{
+    font-size:32px;
+    color:#999;
+    max-width:450px;
+  }
+</style>
+
+<script>
+
+  var resource = require('../common/resource');
+  var baseURL='';
+  function getBaseUrl(config){
+    let bundleUrl = config.bundleUrl;
+    let nativeBase;
+    let isAndroidAssets = bundleUrl.indexOf('file://assets/') >= 0;
+    let isIOSAssets = bundleUrl.indexOf('file:///') >= 0 && bundleUrl.indexOf('WeexDemo.app') > 0;
+
+    if(isAndroidAssets){
+      nativeBase = 'file://assets/';
+    }else if(isIOSAssets){
+      nativeBase = bundleUrl.substring(0, bundleUrl.lastIndexOf('/')+1);
+    }else{
+      let host = 'localhost:8081';
+      let matches = /\/\/([^\/]+?)\//.exec(config.bundleUrl);
+      if(matches && matches.length >= 2){
+        host = matches[1];
+      }
+      nativeBase = 'http://'+host+'/dist/';
+    }
+    let h5Base = 'dist/';
+    let base = nativeBase;
+    if(typeof window === 'object'){
+      base = h5Base;
+    }
+    return base;
+  }
+
+  module.exports = {
+    data: {
+      is_checked:false,
+      icon_def:'',
+      icon_sel:'',
+      index:'',
+      title:'',
+      val:'',
+    },
+    created:function(){
+      let config = this.$getConfig();
+      baseURL = getBaseUrl(config);
+      this.icon_def = baseURL + resource.icons.checkbox_icon;
+      this.icon_sel = baseURL + resource.icons.checkbox_icon_selected;
+    },
+    methods: {
+      onClick:function(){
+        this.is_checked = !this.is_checked;
+        let params = {
+          id:this.index,
+        };
+        this.$dispatch('checkbox.onClick', params);
+      }
+    }
+  }
+</script>

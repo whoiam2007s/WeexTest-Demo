@@ -1,0 +1,294 @@
+<template>
+  <div class="content" >
+
+    <login-nav title="基本信息（2/2）"></login-nav>
+
+    <div style="position:absolute;top:0;right:0;left:0;bottom:0;width:750px;padding-top:89px;padding-bottom:250px;padding-left:80px;padding-right:80px;text-align:center;"
+      ontouchstart="onTouchStart">
+
+      <div style="height:60px;"></div>
+
+      <div if="{{show_index == 0}}">
+        <div style="flex-direction:row;justify-content:space-between;align-items:center;width:590px;">
+          <select-login id="stu_select_province" items="{{provinces}}" kind="null" unit="省" placeholder="省份" width="280"></select-login>
+          <select-login id="stu_select_city" items="{{citys}}" kind="null" unit="市" placeholder="市区" width="280"></select-login>
+        </div>
+
+        <div>
+          <input-login id="stu_input_school" type="text" kind="home" placeholder="学校" ></input-login>
+          <div id="school_list" style="position:absolute;display:none;left:0;top:102px;overflow:hidden;background:#3e4956;padding:30px;width:590px;z-index:99;">
+            <div style="position:absolute;left:95px;top:-20px;width:0;height:0;border-width:10px;border-top-color:rgba(0,0,0,0);border-left-color:rgba(0,0,0,0);border-right-color:rgba(0,0,0,0);border-bottom-color:#3e4956;"></div>
+            <list class="school-list" style="max-height:360px;">
+              <cell repeat="{{school_list}}" value="{{value}}" onclick="onSchoolItemClick" style="padding-left:30px;padding-right:30px;">
+                <text style="font-size:28px;color:#9cc3eb;height:72px;line-height:72px;text-align:left;">{{text}}</text>
+              </cell>
+            </list>
+          </div>
+        </div>
+        <select-login id="stu_select_grade" items="{{grades}}" placeholder="年级" ></select-login>
+        <input-login id="stu_input_name" type="text" kind="man" placeholder="姓名" ></input-login>
+        <input-login id="stu_input_speciality" type="text" kind="book" placeholder="专业" ></input-login>
+        <text class="btn" onclick="onStuBtnClick">确定</text>
+      </div>
+
+      <div if="{{show_index == 1}}">
+        <div style="flex-direction:row;justify-content:space-between;align-items:center;width:590px;">
+          <select-login id="grp_select_province" items="{{provinces}}" kind="null" unit="省" placeholder="省份" width="280"></select-login>
+          <select-login id="grp_select_city" items="{{citys}}" kind="null" unit="市" placeholder="市区" width="280"></select-login>
+        </div>
+        <input-login id="grp_input_school" type="text" kind="home" placeholder="学校" ></input-login>
+        <input-login id="grp_input_name" type="text" kind="man" placeholder="社团名称" ></input-login>
+        <text class="btn" onclick="onGrpBtnClick">确定</text>
+      </div>
+
+      <div if="{{show_index == 2}}">
+        <div style="flex-direction:row;justify-content:space-between;align-items:center;width:590px;">
+          <select-login id="bus_select_province" items="{{provinces}}" kind="null" unit="省" placeholder="省份" width="280"></select-login>
+          <select-login id="bus_select_city" items="{{citys}}" kind="null" unit="市" placeholder="市区" width="280"></select-login>
+        </div>
+        <input-login id="bus_input_name" type="text" kind="home" placeholder="商户名称" ></input-login>
+        <input-login id="bus_input_area" type="text" kind="location" placeholder="商户地址" ></input-login>
+        <text class="btn" onclick="onBusBtnClick">确定</text>
+      </div>
+
+
+
+      <alert id="alert"></alert>
+
+    </div>
+  </div>
+</template>
+
+<style>
+  .content{
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    background:#313842;
+  }
+  .btn{
+    font-size:28px;
+    width:590px;
+    height:92px;
+    line-height:92px;
+    color:#9cc3eb;
+    background:#2b2f38;
+    text-align:center;
+    margin-top:42px;
+  }
+</style>
+
+<script>
+  require('../common/login-nav.we');
+  require('../modals/select-login.we');
+  require('../modals/input-login.we');
+  require('../modals/alert.we');
+
+  var resource = require('../common/resource');
+  var animation = require('@weex-module/animation');
+  var stream = require('@weex-module/stream');
+  var navigator = require('@weex-module/navigator');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      show_index:0,
+      provinces:[
+        {value:1, text:'安徽'},
+        {value:2, text:'北京'},
+        {value:3, text:'上海'},
+      ],
+      citys:[
+        {value:1, text:'合肥'},
+        {value:2, text:'芜湖'},
+        {value:3, text:'淮南'},
+        {value:4, text:'六安'},
+        {value:5, text:'蚌埠'},
+      ],
+      grades:[
+        {value:1, text:'大一'},
+        {value:2, text:'大二'},
+        {value:3, text:'大三'},
+        {value:4, text:'大四'},
+        {value:5, text:'研一'},
+        {value:6, text:'研二'},
+        {value:7, text:'研三'},
+      ],
+      school_list:[
+        {value:1, text:'学校1'},
+        {value:2, text:'学校2'},
+        {value:3, text:'学校3'},
+        {value:4, text:'学校4'},
+        {value:5, text:'学校5'},
+        {value:6, text:'学校6'},
+        {value:7, text:'学校7'},
+      ],
+      icons:{
+      },
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for(let key in this.icons){
+        this.icons[key] = this.baseURL + this.icons[key];
+      }
+
+      let type = resource.getParameterByName('type', config.bundleUrl);
+      this.show_index = type;
+
+      this.$on('loginNav.onBackClick', function(e){
+        e.stop();
+        let params = {
+          animated:true,
+        };
+        navigator.pop(params);
+      });
+    },
+    methods: {
+      onTouchStart:function(){
+
+      },
+      onSchoolItemClick:function(e){
+        let $el = this.$el('school_list');
+        animation.transition($el,{
+          styles:{height:0,padding:0},
+          duration: 100,
+          timingFunction: 'ease',
+        });
+      },
+      onStuBtnClick:function(){
+        let $alert = this.$vm('alert');
+
+        let provice = this.$vm('stu_select_province').val;
+        let city = this.$vm('stu_select_city').val;
+        let school = this.$vm('stu_input_school').val;
+        let grade = this.$vm('stu_select_grade').val;
+        let name = this.$vm('stu_input_name').val;
+        let speciality = this.$vm('stu_input_speciality').val;
+        if(!provice){
+          $alert.show({
+            content: '请选择省份',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!city){
+          $alert.show({
+            content: '请选择市区',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!school){
+          $alert.show({
+            content: '请填写学校',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!grade){
+          $alert.show({
+            content: '请选择年级',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!name){
+          $alert.show({
+            content: '请填写姓名',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!speciality){
+          $alert.show({
+            content: '请填写专业',
+            title: '提示'
+          });
+          return false;
+        }
+        this.registSuc();
+      },
+      onGrpBtnClick:function(){
+        let $alert = this.$vm('alert');
+        let provice = this.$vm('grp_select_province').val;
+        let city = this.$vm('grp_select_city').val;
+        let school = this.$vm('grp_input_school').val;
+        let name = this.$vm('grp_input_name').val;
+        if(!provice){
+          $alert.show({
+            content: '请选择省份',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!city){
+          $alert.show({
+            content: '请选择市区',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!school){
+          $alert.show({
+            content: '请填写学校名称',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!name){
+          $alert.show({
+            content: '请填写社团名称',
+            title: '提示'
+          });
+          return false;
+        }
+        this.registSuc();
+      },
+      onBusBtnClick:function(){
+        let $alert = this.$vm('alert');
+        let provice = this.$vm('bus_select_province').val;
+        let city = this.$vm('bus_select_city').val;
+        let name = this.$vm('bus_input_name').val;
+        let area = this.$vm('bus_input_area').val;
+        if(!provice){
+          $alert.show({
+            content: '请选择省份',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!city){
+          $alert.show({
+            content: '请选择市区',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!name){
+          $alert.show({
+            content: '请填写姓名',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!area){
+          $alert.show({
+            content: '请填写商铺地址',
+            title: '提示'
+          });
+          return false;
+        }
+        this.registSuc();
+      },
+      registSuc:function(){
+        let text = '恭喜您，注册成功！';
+        let url = 'modules/login_page.js';
+        let link = resource.getPageUrl(this.$getConfig(), 'modules/login_rst.js?text='+text+'&url='+url);
+        this.$openURL(link);
+      },
+    }
+  }
+</script>

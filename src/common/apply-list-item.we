@@ -1,0 +1,106 @@
+<template>
+  <div class="content" style="margin-bottom:{{type==0 ? '0' : '5px'}}">
+    <div if="{{type == 0}}" class="cnt line">
+      <div class="info-text">
+        <div class="text-row">
+          <text style="font-size:30px;color:#4e7692;margin-right:10px;">{{userName}}</text>
+          <text style="font-size:24px;color:#999;">{{addTime}}</text>
+        </div>
+        <div class="text-row">
+          <text style="font-size:30px;color:#333;margin-right:10px;">{{productName}}</text>
+          <text style="font-size:30px;color:#ff801a;font-weight:bold;">￥{{productPrice}}</text>
+        </div>
+      </div>
+      <div style="padding-left:40px;border-left:1px solid #eee;">
+        <text class="link" onclick="onBtnClick">申请</text>
+      </div>
+    </div>
+    <div if="{{type == 1}}" >
+      <div class="cnt line">
+        <div class="info-text">
+          <div class="text-row">
+            <text style="font-size:30px;color:#4e7692;margin-right:10px;">{{userName}}</text>
+            <text style="font-size:24px;color:#999;">{{addTime}}</text>
+          </div>
+          <text style="font-size:30px;color:#333;">{{productName}}￥{{productPrice}}</text>
+        </div>
+        <div style="text-align:right;">
+          <text style="font-size:24px;color:#999;">申请金额</text>
+          <text style="font-size:36px;color:#1d8fe1;">￥{{applyMoney}}</text>
+        </div>
+      </div>
+      <div class="cnt" >
+        <div class="text-row">
+          <text if="{{applyState == 3}}" style="font-size:28px;color:#1d8fe1;margin-right:10px;">已转账</text>
+          <text if="{{applyState == 2}}" style="font-size:28px;color:#ff801a;margin-right:10px;">未通过</text>
+          <text if="{{applyState == 1}}" style="font-size:28px;color:#1d8fe1;margin-right:10px;">已通过</text>
+          <text if="{{applyState == 0}}" style="font-size:28px;color:#7bcb1e;margin-right:10px;">审核中</text>
+          <text style="font-size:28px;color:#999;">（{{applyStateStr}}）</text>
+        </div>
+        <div style="padding-top:20px;padding-bottom:20px;height:106px;">
+          <text if="{{applyState == 2}}" class="link" onclick="onBtnClick">重新提交</text>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  .content{
+    padding-left:30px;
+    padding-right:30px;
+    background-color:#FFF;
+  }
+  .cnt{
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .info-text{
+    padding-top:20px;
+    padding-bottom:20px;
+  }
+  .text-row{
+    flex-direction:row;
+    padding-top:10px;
+    padding-bottom:10px;
+  }
+  .link{
+    font-size:30px;
+    color:#FFF;
+    background-color:#1d8fe1;
+    border-radius:5px;
+    height:66px;
+    line-height:66px;
+    padding-left:30px;
+    padding-right:30px;
+  }
+  .line{
+    border-bottom:1px solid #eee;
+  }
+
+</style>
+
+<script>
+  module.exports = {
+    data: {
+      type:0,
+      orderId:'',
+      userName:'',
+      addTime:'',
+      productName:'',
+      productPrice:'',
+      applyMoney:'',
+      applyState:'',
+      applyStateStr:'',
+    },
+    methods: {
+      onBtnClick:function(e){
+        let params = {
+          id:this.orderId,
+        };
+        this.$dispatch('applyListItem.onBtnClick', params);
+      },
+    }
+  }
+</script>

@@ -1,0 +1,84 @@
+<template>
+  <div class="content" >
+    <image style="width:750px;height:890px;" src="{{icons.logo_1}}"></image>
+
+    <div style="position:absolute;left:0;bottom:0;width:750px;text-align:center;align-items:center;">
+      <text style="font-size:24px;color:#5a6d83;padding:10px;">{{title}}</text>
+      <text class="btn" onclick="onLoginClick">登录</text>
+      <text class="btn b-2" onclick="onRegistClick">注册</text>
+    </div>
+
+  </div>
+</template>
+
+<style>
+  .content{
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    background:#313842;
+  }
+  .btn{
+    font-size:28px;
+    width:590px;
+    height:92px;
+    line-height:92px;
+    color:#313842;
+    background:#9cc3ec;
+    text-align:center;
+    margin-top:28px;
+  }
+  .b-2{
+    color:#9cc3ec;
+    background:#313842;
+    border:3px solid #9cc3ec;
+    margin-bottom:65px;
+  }
+
+</style>
+
+<script>
+
+  var resource = require('../common/resource');
+  var navigator = require('@weex-module/navigator');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      icons:{
+        logo_1:resource.images.login_logo_1,
+      },
+      title:resource.text.versionText,
+      login_page_url:'',
+      regist_page_url:'',
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for(let key in this.icons){
+        this.icons[key] = this.baseURL + this.icons[key];
+      }
+      this.login_page_url = resource.getPageUrl(config, 'modules/login_page.js');
+      this.regist_page_url = resource.getPageUrl(config, 'modules/regist_page.js');
+
+    },
+    methods: {
+      onLoginClick:function(){
+        let params = {
+          url:this.login_page_url,
+          animated:true,
+        };
+        navigator.push(params);
+      },
+      onRegistClick:function(){
+        let params = {
+          url:this.regist_page_url,
+          animated:true,
+        };
+        navigator.push(params);
+      },
+    }
+  }
+</script>

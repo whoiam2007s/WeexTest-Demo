@@ -1,0 +1,165 @@
+<template>
+  <div class="content">
+
+    <nav-bar is_back_show="{{true}}" title="业务培训" is_tixing_show="{{false}}" ></nav-bar>
+
+    <tabbar-blks style="position:fixed;left:0;top:89px;" items="{{items}}"></tabbar-blks>
+
+    <div if="{{blks_selectedIndex == 0}}" style="top:185px;">
+      <list class="list" style="height:{{deviceHeight-185}}px;padding-top:20px;">
+        <cell if="{{items[0].artList.length == 0}}">
+          <text style="font-size:30px;text-align:center;padding:50px;background:#FFF;color:#666;">暂无内容</text>
+        </cell>
+        <cell>
+          <training-article repeat="{{items[0].artList}}" is-type-show="{{true}}" id="{{id}}" title="{{title}}" remark="{{remark}}" articleType="{{articleType}}" video="{{video}}" videolength="{{videolength}}" createdate="{{createdate}}" image="{{image}}" ></training-article>
+        </cell>
+      </list>
+    </div>
+    <div if="{{blks_selectedIndex == 1}}" style="top:185px;">
+      <list class="list" style="height:{{deviceHeight-185}}px;padding-top:20px;">
+        <cell if="{{items[1].artList.length == 0}}">
+          <text style="font-size:30px;text-align:center;padding:50px;background:#FFF;color:#666;">暂无内容</text>
+        </cell>
+        <cell>
+          <training-article repeat="{{items[1].artList}}" is-type-show="{{false}}" id="{{id}}" title="{{title}}" remark="{{remark}}" articleType="{{articleType}}" video="{{video}}" videolength="{{videolength}}" createdate="{{createdate}}" image="{{image}}" ></training-article>
+        </cell>
+      </list>
+    </div>
+    <div if="{{blks_selectedIndex == 2}}" style="top:185px;">
+      <list class="list" style="height:{{deviceHeight-185}}px;padding-top:20px;">
+        <cell if="{{items[2].artList.length == 0}}">
+          <text style="font-size:30px;text-align:center;padding:50px;background:#FFF;color:#666;">暂无内容</text>
+        </cell>
+        <cell>
+          <training-article style="margin-bottom:20px;" repeat="{{items[2].artList}}" is-type-show="{{false}}" id="{{id}}" title="{{title}}" remark="{{remark}}" articleType="{{articleType}}" video="{{video}}" videolength="{{videolength}}" createdate="{{createdate}}" image="{{image}}" ></training-article>
+        </cell>
+      </list>
+    </div>
+    <div if="{{blks_selectedIndex == 3}}" style="top:185px;">
+      <list class="list" style="height:{{deviceHeight-185}}px;padding-top:20px;">
+        <cell if="{{items[3].artList.length == 0}}">
+          <text style="font-size:30px;text-align:center;padding:50px;background:#FFF;color:#666;">暂无内容</text>
+        </cell>
+        <cell>
+          <training-article style="margin-bottom:20px;" repeat="{{items[3].artList}}" is-type-show="{{false}}" id="{{id}}" title="{{title}}" remark="{{remark}}" articleType="{{articleType}}" video="{{video}}" videolength="{{videolength}}" createdate="{{createdate}}" image="{{image}}" ></training-article>
+        </cell>
+      </list>
+    </div>
+
+  </div>
+
+</template>
+
+<style>
+  .content{
+    background-color:#efeff4;
+  }
+  .bg-f{background:#FFF;}
+  .bar-20{margin-bottom:20px;}
+
+</style>
+
+<script>
+  require('../common/nav-bar.we');
+  require('../common/tabbar-blks.we');
+  require('../common/training-article.we');
+
+  var resource = require('../common/resource');
+
+  function getInfo(data, callback){
+    let rst = [];
+    for(let i=0; i<5; i++){
+      let sta = 1;
+      let imgs = 'https://www.kangzhuangxueche.com:8098/upload/images/2016-08-30/sadfsrdgrthrtjr.jpg';
+      if(data.article_type == 0){
+        sta = Math.ceil(Math.random()*3);
+      }else{
+        sta = data.article_type;
+      }
+      if(sta == 3){
+        Math.random()>.5 ? imgs += '|'+imgs : imgs += '|'+imgs + '|'+imgs;
+      }
+      let timestamp = new Date().getTime() - Math.round(Math.random()*10000);
+      rst.push({id:120+i,title:'文章标题'+i,remark:'摘要',articleType:sta,video:'http://g.tbcdn.cn/ali-wireless-h5/res/0.0.6/toy.mp4',videolength:'04:30',createdate:timestamp,image:imgs});
+    }
+    callback(rst);
+  }
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      items:[
+        {
+          index:0,
+          title:'全部',
+          color:'',
+          shadowColor:'',
+          artList:[],
+        },
+        {
+          index:1,
+          title:'文章',
+          color:'',
+          shadowColor:'',
+          artList:[],
+        },
+        {
+          index:2,
+          title:'视频',
+          color:'',
+          shadowColor:'',
+          artList:[],
+        },
+        {
+          index:3,
+          title:'图片',
+          color:'',
+          shadowColor:'',
+          artList:[],
+        },
+      ],
+      pages:[0, 0],
+      page_size:5,
+      deviceHeight:1000,
+      blks_selectedIndex:0,
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+
+      let d_h = config.env.deviceHeight;
+      this.deviceHeight = d_h;
+
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+
+      this.getData(0);
+      this.getData(1);
+      this.getData(2);
+      this.getData(3);
+
+      this.$on('tabbarBlks.onItemClick', function(e){
+        this.blks_selectedIndex = e.detail.index;
+      });
+    },
+    methods: {
+      initData:function(index, artList){
+        this.items[index].artList = artList;
+        if(artList.length <= 0){
+          this.pages[index]--;//没有返回数据时，则保持在请求页码
+        }
+      },
+      getData:function(index){
+        let self = this;
+        getInfo({
+          article_type:index,
+          page:this.pages[index]++,
+          page_size:this.page_size,
+        }, function(data){
+          self.initData(index, data);
+        });
+      }
+    }
+  }
+</script>

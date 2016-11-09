@@ -1,0 +1,61 @@
+<template>
+  <div class="content">
+    <checkbox repeat="{{items}}" id="chk_{{$index}}" index="chk_{{$index}}" is_checked="{{selectedIndex == $index}}"
+              title="{{title}}" val="{{val?val:title}}" ></checkbox>
+  </div>
+</template>
+
+<style>
+  .content{
+    background-color:#FFF;
+  }
+</style>
+
+<script>
+
+  module.exports = {
+    data: {
+      items:[],
+      value:[],
+      type:'radio',
+      selectedIndex:-1,
+    },
+    created:function(){
+      if(this.type == 'radio' && !(this.items[this.selectedIndex])){
+        this.selectedIndex = 0;
+      }
+      var val = [];
+      if(this.items[this.selectedIndex]){
+        val.push(this.items[this.selectedIndex].value ? this.items[this.selectedIndex].value : this.items[this.selectedIndex].title);
+      }
+      this.value = val;
+
+      this.$on('checkbox.onClick', function(e){
+        e.stop();
+        let id = e.detail.id;
+        let $tvm = this.$vm(id);
+        let checked = $tvm.is_checked;
+
+        if(this.type == 'radio'){
+          if(!checked){$tvm.is_checked=true;return true;}//禁止取消选择
+          for(let key in this.items){
+            let $vm = this.$vm('chk_'+key);
+            if($vm.is_checked && $vm.index != id){
+              $vm.is_checked=false;
+            }
+          }
+        }
+        var val = [];
+        for(let key in this.items){
+          let $vm = this.$vm('chk_'+key);
+          if($vm.is_checked){
+            val.push($vm.val);
+          }
+        }
+        this.value = val;
+      });
+    },
+    methods: {
+    }
+  }
+</script>

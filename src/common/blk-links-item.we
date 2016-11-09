@@ -1,0 +1,70 @@
+<template>
+  <div class="blk" style="background-color:{{bg_color}};left:{{blk_left}};top:{{blk_top}};width:{{blk_width}};height:{{blk_height}};border-right:{{right_line}}px solid #eee;" blkid="{{id}}" url="{{url}}" ontouchstart="onBtnTouchStart" ontouchend="onBtnTouchEnd">
+    <image style="width:{{icon_width}};height:{{icon_height}};" src="{{icon}}"></image>
+    <text style="font-size:{{text_size}};color:#333;">{{title}}</text>
+  </div>
+</template>
+
+<style>
+  .blk{
+    position:absolute;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    border-top:1px solid #eee;
+    background-color:#FFF;
+  }
+
+</style>
+
+<script>
+
+  var resource = require('../common/resource');
+
+  module.exports = {
+    data: {
+      id:1,
+      index:0,
+      icon:'',
+      title:'',
+      url:'',
+      size:1,
+      right_line:1,
+      blk_left:0,
+      blk_top:0,
+      blk_width:187.5,
+      blk_height:187.5,
+      icon_width:80,
+      icon_height:80,
+      text_size:24,
+      bg_color:'#FFF',
+    },
+    created:function(){
+      switch(this.size){
+        case 1:
+              this.blk_width = 187.5;
+              this.blk_height = 187.5;
+              this.icon_width = 80;
+              this.icon_height = 80;
+              this.text_size = 24;
+              break;
+        default:;
+      }
+      this.blk_top = Math.floor(this.index/4)*this.blk_height;
+      let l = (this.index+1)%4-1;
+      if(l === -1){ l = 3;this.right_line = 0;}
+      this.blk_left = this.blk_width * l;
+    },
+    methods: {
+      onBtnTouchStart:function(){
+        this.bg_color = '#f5f9fc';
+      },
+      onBtnTouchEnd:function(){
+        this.bg_color = '#FFF';
+        if(this.url){
+          this.$openURL(this.url);
+        }
+      },
+    }
+  }
+</script>

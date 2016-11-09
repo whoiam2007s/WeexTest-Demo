@@ -1,0 +1,32 @@
+<template>
+  <div>
+    <main if="{{is_login}}" ></main>
+    <login if="{{!is_login}}" ></login>
+
+  </div>
+</template>
+
+<script>
+  require('./modules/main.we');
+  require('./modules/login.we');
+
+  module.exports = {
+    data: {
+      is_login:false
+    },
+    created:function(){
+      let storage = require('@weex-module/storage');
+      let self = this;
+      storage.getItem('is_user_login', function(e){
+        self.is_login = e.result && e.data != 'undefined' ? (e.data == 1 ? true : false) : false;
+      });
+    },
+    methods:{
+    }
+  }
+
+</script>
+
+
+
+

@@ -1,0 +1,43 @@
+<template>
+  <div class="content">
+    <image style="width:160px;height:160px;" src="{{icons_empty}}"></image>
+    <text style="font-size:30px;color:#999;padding:25px;">{{title}}</text>
+    <div style="flex-direction:row;justify-content:center;align-items:center;">
+      <text style="font-size:30px;color:#1d8fe1;">立即分享</text>
+      <image style="width:30px;height:30px;margin-left:5px;" src="{{icons_arrow}}"></image>
+    </div>
+  </div>
+</template>
+
+<style>
+  .content{
+    padding-top:125px;
+    padding-bottom:125px;
+    justify-content:center;
+    align-items:center;
+    background:#FFF;
+  }
+</style>
+
+<script>
+
+  var resource = require('../common/resource');
+  var baseURL='';
+
+  module.exports = {
+    data: {
+      kind:1,
+      icons_empty:'',
+      icons_empty1:resource.icons.list_empty_img1,
+      icons_empty2:resource.icons.list_empty_img2,
+      icons_arrow:resource.icons.list_empty_arrow,
+    },
+    created:function(){
+      let config = this.$getConfig();
+      baseURL = resource.getBaseUrl(config);
+      this.icons_arrow = baseURL + this.icons_arrow;
+      this.icons_empty = baseURL + (this.kind == 1 ? this.icons_empty1 : this.icons_empty2);
+    },
+    methods: {}
+  }
+</script>

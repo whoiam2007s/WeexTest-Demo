@@ -1,0 +1,92 @@
+<template>
+  <div class="content" >
+
+    <login-nav title="基本信息（1/2）"></login-nav>
+
+    <div style="position:absolute;top:0;right:0;left:0;bottom:0;width:750px;padding-top:89px;padding-bottom:250px;padding-left:80px;padding-right:80px;text-align:center;justify-content:center;align-items:center;">
+
+      <text class="btn" style="background-color:{{bgColor_0}}" index="0" ontouchstart="onTouchStart" ontouchend="onTouchEnd" >我是学生</text>
+      <text class="btn" style="background-color:{{bgColor_1}}" index="1" ontouchstart="onTouchStart" ontouchend="onTouchEnd" >我是社团</text>
+      <text class="btn" style="background-color:{{bgColor_2}}" index="2" ontouchstart="onTouchStart" ontouchend="onTouchEnd" >我是商户</text>
+
+      <div style="position:absolute;left:80px;bottom:60px;width:590px;height:138px;background:#2e363c;flex-direction:row;justify-content:center;align-items:center;">
+        <image style="width:60px;height:60px;margin-right:20px;" src="{{icons.service}}"></image>
+        <div style="text-align:left;">
+          <text style="font-size:26px;color:#596e84;">如有疑问请拨打客服电话</text>
+          <text style="font-size:30px;color:#9cc3eb;">400-800-6533</text>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<style>
+  .content{
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    background:#313842;
+  }
+  .btn{
+    font-size:28px;
+    color:#9cc3eb;
+    width:590px;
+    height:92px;
+    line-height:92px;
+    margin:18px;
+  }
+</style>
+
+<script>
+  require('../common/login-nav.we');
+
+  var resource = require('../common/resource');
+  var navigator = require('@weex-module/navigator');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      bgColor_0:'#2b3038',
+      bgColor_1:'#2b3038',
+      bgColor_2:'#2b3038',
+      norColor:'#2b3038',
+      selColor:'#252930',
+      icons:{
+        service:resource.icons.login_service,
+      },
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for(let key in this.icons){
+        this.icons[key] = this.baseURL + this.icons[key];
+      }
+      this.$on('loginNav.onBackClick', function(e){
+        e.stop();
+        let params = {
+          animated:true,
+        };
+        navigator.pop(params);
+      });
+    },
+    methods: {
+      onTouchStart:function(e){
+        let index = e.target.attr.index;
+        this['bgColor_'+index] = this.selColor;
+      },
+      onTouchEnd:function(e){
+        let index = e.target.attr.index;
+        this['bgColor_'+index] = this.norColor;
+        let url = resource.getPageUrl(this.$getConfig(), 'modules/regist_base_2.js?type='+index);
+        let params = {
+          url:url,
+          animated:true,
+        };
+        navigator.push(params);
+      },
+    }
+  }
+</script>

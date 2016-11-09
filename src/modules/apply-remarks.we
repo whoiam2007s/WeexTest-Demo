@@ -1,0 +1,146 @@
+<template>
+  <div class="content">
+
+    <nav-bar is_back_show="{{true}}" title="备注" is_tixing_show="{{false}}" ></nav-bar>
+
+    <div style="position:fixed;left:0;top:89px;width:750px;height:80px;flex-direction:row;align-items:center;padding-left:30px;background:#f6f9fb;border-bottom:1px solid #eee;z-index:10;">
+      <text style="font-size:32px;color:#666;">学员</text>
+      <text style="font-size:32px;color:#1d8fe1;margin-left:5px;margin-right:5px;">{{name}}</text>
+      <text style="font-size:32px;color:#666;">的信息概要</text>
+    </div>
+
+    <scroller style="height:{{deviceHeight}}px;">
+      <div style="height:169px;"></div>
+
+        <apply-remarks-blk repeat="{{marks}}" remarkId="{{remarkId}}" type="{{type}}" content="{{content}}" addTime="{{addTime}}" ></apply-remarks-blk>
+
+      <div style="height:94px;"></div>
+    </scroller>
+
+    <div style="position:fixed;left:0;bottom:0;width:750px;height:94px;flex-direction:row;border-top:1px solid #eee;background:#FFF;">
+      <input id="myinput" type="text" value="" placeholder="新增备注" onchange="onInputChange" style="font-size:32px;line-height:54px;height:94px;padding:20px;width:570px;color:#666;border:0;outline:0;" />
+      <text style="width:180px;height:94px;line-height:94px;color:#FFF;text-align:center;font-size:36px;background:#1d8fe1;" onclick="onAddClick">保存</text>
+    </div>
+
+    <alert id="alert"></alert>
+    <confirm id="confirm"></confirm>
+
+  </div>
+
+</template>
+
+<style>
+  .content{
+    background-color:#efeff4;
+  }
+  .bg-f{background:#FFF;}
+  .bar-20{margin-bottom:20px;}
+
+</style>
+
+<script>
+  require('../common/nav-bar.we');
+  require('../common/apply-remarks-blk.we');
+  require('../modals/alert.we');
+  require('../modals/confirm.we');
+
+  var resource = require('../common/resource');
+
+  function getInfo(callback){
+    callback(
+      [
+        {remarkId:'5',type:1,content:'欧了！',addTime:'2016-09-12 10:54:21'},
+        {remarkId:'1',type:0,content:'要访问此窗口，请按照本主题的“备注”部分中的说明进行。',addTime:'2016-09-12 10:54:21'},
+        {remarkId:'2',type:0,content:'有用！！确实有用！家里养的是拉拉幼犬，放了报纸在卫生间，喷了一点在报纸上，真的有到报纸上拉尿尿了。特意用了几天才来评价的。现在不用喷也知道到厕所拉尿尿了，其实重要的还是要当下的奖励',addTime:'2016-09-12 10:54:21'},
+        {remarkId:'3',type:0,content:'用户名称1户名称1户名称1',addTime:'2016-09-12 10:54:21'},
+        {remarkId:'4',type:0,content:'用户名称1',addTime:'2016-09-12 10:54:21'},
+      ]
+    );
+  }
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      name:'姓名',
+      inputStr:'',
+      marks:[],
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+
+      let d_h = config.env.deviceHeight;
+      this.deviceHeight = d_h;
+
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+
+      let self = this;
+      getInfo(function(data){
+        self.initData(data);
+      })
+
+      this.$on('applyRemarksBlk.onDelClick', function(e){
+        let self = this;
+        let remarkId = e.detail.remarkId;
+        let $confirm = this.$vm('confirm');
+        $confirm.show({
+          content:'确定删除这个备注信息吗？',
+          callback:function(){
+            self.delThisMark(remarkId);
+          },
+        });
+      });
+    },
+    methods: {
+      initData:function(data){
+        this.marks = data;
+      },
+      onInputChange:function(e){
+        this.inputStr = e.value;
+      },
+      onAddClick:function(){
+        let self = this;
+        if(this.inputStr){
+          let $confirm = this.$vm('confirm');
+          $confirm.show({
+            content:'确定新增这个备注信息吗？',
+            callback:function(){
+              self.addThisMark();
+            },
+          });
+        }else{
+          let $alert = this.$vm('alert');
+          $alert.show({
+            content:'请填写备注信息！',
+          });
+        }
+      },
+      addThisMark(){
+        let $alert = this.$vm('alert');
+        $alert.show({
+          content:'新增成功！',
+        });
+        let datetime = resource.dateFormat(new Date(), 'yyyy-MM-dd h:m:s');
+        this.marks.unshift({
+          remarkId:Math.random(),
+          type:0,
+          content:this.inputStr,
+          addTime:datetime,
+        });
+      },
+      delThisMark:function(remarkId){
+        let $alert = this.$vm('alert');
+        $alert.show({
+          content:'删除成功！',
+        });
+        for(let i=0; i<this.marks.length; i++){
+          if(this.marks[i].remarkId == remarkId){
+            this.marks.splice(i, 1);return true;
+          }
+        }
+      }
+    }
+  }
+</script>

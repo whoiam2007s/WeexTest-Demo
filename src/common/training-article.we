@@ -1,0 +1,130 @@
+<template>
+  <div class="content">
+    <div if="{{articleType == 1}}" onclick="onLinkOpen" style="padding-top:30px;padding-bottom:30px;flex-direction:row;justify-content:space-between;align-items:flex-start; border-bottom:1px solid #eee;">
+      <div style="width:460px;">
+        <text class="title" style="lines:2;height:100px;">{{title}}</text>
+        <text class="remark" style="lines:1;">{{remark}}</text>
+        <text if="{{isTypeShow}}" class="type" style="background:#1d8fe1;">文章</text>
+      </div>
+      <div style="width:190px;">
+        <image style="width:190px;height:150px;" src="{{image}}"></image>
+        <text if="{{isTypeShow}}" class="remark" style="text-align:right;margin-top:10px;">{{time}}</text>
+      </div>
+    </div>
+
+    <div if="{{articleType == 2}}" style="padding-top:30px;padding-bottom:30px;border-bottom:1px solid #eee;">
+      <text class="title" style="lines:1;">{{title}}</text>
+      <div style="height:420px;width:690px;">
+        <video src="{{video}}"  play-status="{{playstate ? 'play' : 'pause'}}" style="width:690px;height:420px;"></video>
+        <div if="{{!playstate}}" style="position:absolute;left:0;top:0;width:690px;height:420px;">
+          <image style="width:690px;height:420px;" src="{{icons.face}}"></image>
+          <text style="position:absolute;left:0;bottom:0;width:690px;line-height:30px;height:30px;padding-left:15px;font-size:24px;color:#FFF;background-color:rgba(0,0,0,.4);">{{videolength}}</text>
+          <image style="position:absolute;left:289px;top:154px;width:112px;height:112px;" src="{{icons.play}}" onclick="onPlayClick"></image>
+        </div>
+      </div>
+      <text if="{{isTypeShow}}" class="type" style="background:#ff801a;">视频</text>
+    </div>
+
+    <div if="{{articleType == 3}}" onclick="onLinkOpen" style="padding-top:30px;padding-bottom:30px;border-bottom:1px solid #eee;">
+      <text class="title" style="lines:1;">{{title}}</text>
+      <div style="flex-direction:row;align-items:center;">
+        <image repeat="{{images}}" src="{{src}}" style="width:224px;height:224px;margin-left:{{ $index == 0 ? '0' : '10' }}px" ></image>
+        <text style="position:absolute;bottom:15px;right:30px;font-size:28px;color:#FFF;line-height:36px;height:36px;background-color:rgba(0,0,0,.4);padding-left:15px;padding-right:15px;">{{images.length}}图</text>
+      </div>
+      <text if="{{isTypeShow}}" class="type" style="background:#1d8fe1;">图片</text>
+    </div>
+
+  </div>
+</template>
+
+<style>
+  .content{
+    padding-left:30px;
+    padding-right:30px;
+    background:#FFF;
+  }
+  .title{
+    font-size:30px;
+    color:#333;
+    font-weight:bold;
+    line-height:50px;
+    text-overflow:ellipsis;
+  }
+  .remark{
+    font-size:26px;
+    color:#999;
+    line-height:50px;
+    text-overflow:ellipsis;
+  }
+  .type{
+    font-size:22px;
+    color:#FFF;
+    line-height:32px;
+    height:32px;
+    margin-top:15px;
+    width:80px;
+    text-align:center;
+  }
+
+</style>
+
+<script>
+  var resource = require('../common/resource');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      id:'',
+      title:'',
+      remark:'',
+      articleType:'',
+      video:'',
+      videolength:'',
+      createdate:'',
+      time:'',
+      image:'',
+      images:[],
+      isTypeShow:false,
+      playstate:false,
+      icons:{
+        play:resource.icons.video_play,
+        face:resource.images.video_face,
+      },
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+      let arr = this.image.split('|');
+      for(let key in arr){
+        this.images.push({src:arr[key]});
+      }
+      if(this.articleType == 1){
+        let nTime = new Date().getTime() - this.createdate;
+        let day = Math.floor(nTime/86400);
+        let hour = Math.floor(nTime%86400/3600);
+        let minute = Math.floor(nTime%86400%3600/60);
+        if(day > 0){
+          this.time = resource.dateFormat(this.createdate, 'MM-dd hh:mm');
+        }else{
+          if(hour > 0){
+            this.time = hour+'小时前';
+          }else{
+            this.time = minute+'分钟前';
+          }
+        }
+      }
+    },
+    methods: {
+      onPlayClick:function(){
+        this.playstate = true;
+      },
+      onLinkOpen:function(){
+        let url = 'http://192.168.5.216:81/index.php/wap/article/show/'+this.id+'?app=1';
+        this.$openURL(url);
+      }
+    }
+  }
+</script>

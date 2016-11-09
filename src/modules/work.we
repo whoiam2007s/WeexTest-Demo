@@ -1,0 +1,307 @@
+<template>
+
+  <div class="content">
+
+    <nav-bar is_back_show="{{false}}" title="工作" is_tixing_show="{{true}}" ></nav-bar>
+
+    <scroller style="height:{{deviceHeight}}px;">
+
+      <div style="height:89px;"></div>
+
+      <image src="{{userFace}}" style="position:{{userface_pos}};top:{{userface_top}}px;width:73px;height:73px;border-radius:37px;z-index:100;left:30px;"></image>
+
+      <div style="position:absolute;left:0;top:68px;height:50px;width:50px;z-index:100;" onappear="userFaceAppear" ondisappear="userFaceDisappear"></div>
+
+      <div class="bg-f" style="padding-top:30px;">
+        <div style="align-items:flex-end;padding-right:30px;">
+          <a href="{{how_to_get_money}}" style="flex-direction:row;justify-content:center;width:150px;height:50px;">
+            <text style="font-size:24px;color:#999;">如何赚钱</text>
+            <image style="width:23px;height:23px;" src="{{icons.help}}"></image>
+          </a>
+        </div>
+        <div style="padding-bottom:35px;align-items:center;">
+          <div style="flex-direction:row;align-items:center;justify-content:center;">
+            <text class="total_num" if="{{is_total_num_show}}">{{userTotal}}</text>
+            <text class="total_num" if="{{!is_total_num_show}}"> **** </text>
+            <image style="width:48px;height:48px;" src="{{icon_eye}}" onclick="onEyeClick"></image>
+          </div>
+          <text style="font-size:32px;color:#ff801a;padding:5px;">累计收益（元）</text>
+        </div>
+
+        <div style="flex-direction:row;justify-content:center;padding:15px;">
+          <work-top-num num="{{customerNum}}" unit="人" title="意向报名"></work-top-num>
+          <work-top-num num="{{regNum}}" unit="人" title="APP注册量"></work-top-num>
+          <work-top-num num="{{payNum}}" unit="人" title="累计招生"></work-top-num>
+        </div>
+
+      </div>
+      <div class="work-zhanbao bar-20">
+        <image src="{{icons.zhanbao}}" style="width:126px;height:28px;margin-right:30px;"></image>
+        <text style="width:534px;height:28px;line-height:28px;color:#666;font-size: 28px;text-overflow:ellipsis;lines:1">{{zhanbao_text}}</text>
+      </div>
+
+      <slider class="banner-links bar-20" auto-play="true" interval="5000" append="tree" >
+        <image class="banner-links" repeat="{{banner_image_list}}" src="{{image}}" url="{{url}}" onclick="onBannerImageClick" ></image>
+        <indicator class="banner-indicator"></indicator>
+      </slider>
+
+      <div class="bg-f bar-20">
+        <bar-title title="移动办公" is_icon="{{true}}" icon_src="{{icons.bangong}}"></bar-title>
+        <blk-links link_items="{{bangong_items}}" size="1" ></blk-links>
+      </div>
+
+      <div class="bg-f bar-20">
+        <bar-title title="康庄学院" is_icon="{{true}}" icon_src="{{icons.xueyuan}}"></bar-title>
+        <div style="padding-left:30px;padding-right:30px;">
+          <article-item-1 repeat="{{xueyuan_items}}" type="{{articleType}}" title="{{articleTitle}}" description="{{articleRemark}}" time="{{articleTime}}" src="{{articleImage}}" url="{{articleId}}" ></article-item-1>
+        </div>
+      </div>
+
+      <div style="height:98px;"></div>
+
+    </scroller>
+
+  </div>
+
+</template>
+
+<style>
+  .content{
+    /*padding-top:89px;*/
+  }
+  .bar-20{
+    margin-bottom:20px;
+  }
+  .bg-f{background:#FFF;}
+  .banner-links{
+    width:750px;
+    height:180px;
+  }
+  .banner-indicator{
+    left:0;
+    top:150px;
+    width:750px;
+    height:20px;
+    item-color: rgba(0,0,0,.1);
+    item-selectedColor: rgba(0,0,0,.3);
+    item-size: 14;
+  }
+  .work-zhanbao{
+    flex-direction:row;
+    padding:30px;
+    width:750px;
+    height:88px;
+    background-color:#f5fafb;
+  }
+  .total_num{
+    font-size:60px;
+    color:#444b54;
+    margin-right:10px;
+    min-width:180px;
+    text-align:center;
+  }
+
+</style>
+
+<script>
+
+  require('../common/bar-title.we');
+  require('../common/nav-bar.we');
+  require('../common/blk-links.we');
+  require('../common/article-item-1.we');
+  require('../common/work-top-num.we');
+
+  var resource = require('../common/resource');
+  var navigator = require('@weex-module/navigator');
+  var webview = require('@weex-module/webview');
+
+  var baseURL='';
+
+  function getInfo(callback){
+    callback({
+      userFace:baseURL+resource.temp.head_1,
+      customerNum:'123',
+      regNum:'53',
+      payNum:'162',
+      userTotal:'7600.00',
+      banner:[
+        {url:'',image:baseURL+resource.temp.banner_1},
+        {url:'',image:baseURL+resource.temp.banner_1},
+        {url:'',image:baseURL+resource.temp.banner_1},
+        {url:'',image:baseURL+resource.temp.banner_1},
+        {url:'',image:baseURL+resource.temp.banner_1},
+      ],
+      article:[
+        {articleId:1,articleType:1,articleTitle:'出了就隐藏起来，超出了就隐藏起藏起来，超出了就隐藏起',articleRemark:'描出了就隐藏起来，超出了就隐藏起来，超出了就隐藏起出了就隐藏起来，超出了就隐藏起来，超出了就隐藏起出了就隐藏起来，超出了就隐藏起来，超出了就隐藏起出了就隐藏起来，超出了就隐藏起来，超出了就隐藏起出了就隐藏起来，超出了就隐藏起来，超出了就隐藏起出了就隐藏起来，超出了就隐藏起来，',articleTime:'1小时前',articleImage:baseURL+resource.temp.news_1},
+        {articleId:1,articleType:2,articleTitle:'文章标题',articleRemark:'描述文字',articleTime:'1小时前',articleImage:baseURL+resource.temp.news_1},
+        {articleId:1,articleType:3,articleTitle:'文章标题',articleRemark:'描述文字',articleTime:'1小时前',articleImage:baseURL+resource.temp.news_1},
+        {articleId:1,articleType:2,articleTitle:'文章标题',articleRemark:'描述文字',articleTime:'1小时前',articleImage:baseURL+resource.temp.news_1},
+        {articleId:1,articleType:1,articleTitle:'文章标题',articleRemark:'描述文字',articleTime:'1小时前',articleImage:baseURL+resource.temp.news_1},
+      ],
+      news:{
+        content:'显示一些战报信息，超出了就隐藏起来，超出了就隐藏起来，超出了就隐藏起来，超出了就隐藏',
+      },
+    });
+  }
+
+  module.exports = {
+    data: {
+      icons:{
+        zhanbao:resource.images.work_zhanbao,
+        bangong:resource.icons.work_bangong,
+        xueyuan:resource.icons.work_school,
+        help:resource.icons.work_help,
+        eye_open:resource.icons.work_yanjing,
+        eye_close:resource.icons.work_biyan,
+      },
+      banner_image_list:[],
+      zhanbao_text:'显示一些战报信息，超出了就隐藏起来，超出了就隐藏起来，超出了就隐藏起来，超出了就隐藏起来',
+      bangong_items:[
+        {
+          id:0,
+          icon:resource.icons.work_bangong_1,
+          title:'招生名片',
+          url:'',
+        },
+        {
+          id:1,
+          icon:resource.icons.work_bangong_2,
+          title:'提成申请',
+          url:'modules/apply.js',
+        },
+        {
+          id:2,
+          icon:resource.icons.work_bangong_3,
+          title:'工作安排',
+          url:'',
+        },
+        {
+          id:3,
+          icon:resource.icons.work_bangong_4,
+          title:'活动宣传',
+          url:'modules/events.js',
+        },
+        {
+          id:4,
+          icon:resource.icons.work_bangong_5,
+          title:'业务培训',
+          url:'modules/training.js',
+        },
+        {
+          id:5,
+          icon:resource.icons.work_bangong_6,
+          title:'物料申请',
+          url:'',
+        },
+        {
+          id:6,
+          icon:'',
+          title:'',
+          url:'',
+        },
+        {
+          id:7,
+          icon:'',
+          title:'',
+          url:'',
+        },
+      ],
+      xueyuan_items:[],
+      userFace:'',
+      customerNum:'',
+      regNum:'',
+      payNum:'',
+      userTotal:'',
+      is_total_num_show:true,
+      icon_eye:'',
+      how_to_get_money:resource.urls.how_to_get_money,
+      deviceHeight:1000,
+      userface_top:125,
+      userface_pos:'absolute',
+      scroll_top:0,
+    },
+    created:function(){
+      let self = this;
+      let config = this.$getConfig();
+      let d_v = config.env.deviceWidth;
+      let d_h = config.env.deviceHeight;
+      this.deviceHeight = d_h;
+
+      baseURL = resource.getBaseUrl(config);
+      for (let key in this.icons){
+        this.icons[key] = baseURL+this.icons[key];
+      }
+      this.icon_eye = this.icons.eye_open;
+      for (let key in this.bangong_items){
+        this.bangong_items[key].icon = baseURL+this.bangong_items[key].icon;
+        if(this.bangong_items[key].url != ''){
+          this.bangong_items[key].url = resource.getPageUrl(config, this.bangong_items[key].url);
+        }
+      }
+
+      getInfo(function(data){
+        self.initData(data);
+      });
+
+      this.$on('onBlkClick', function(e){
+        let id = e.detail.id;
+        let url = e.detail.url;
+        if(url != ''){
+          this.$openURL(url);
+        }
+      });
+      this.$on('onArticleItemClick', function(e){
+        let articleId = e.detail.url;
+        let params = {
+          url: 'http://www.baidu.com?id='+articleId,
+          animated:true,
+        };
+        navigator.push(params);
+      });
+
+    },
+    methods: {
+      onBannerImageClick:function(e){
+        let url = e.target.attr.url;
+        let params = {
+          url:url,
+          animated:true,
+        };
+        navigator.push(params);
+      },
+      showWebView:function(url){
+        /*let $el = this.$el('webview');
+        $el.src = url;*/
+      },
+      onEyeClick:function(){
+        this.is_total_num_show = !this.is_total_num_show;
+        if(this.is_total_num_show){
+          this.icon_eye = this.icons.eye_open;
+        }else{
+          this.icon_eye = this.icons.eye_close;
+        }
+      },
+      initData:function(data){
+        this.banner_image_list = data.banner;
+        this.zhanbao_text = data.news.content;
+        this.xueyuan_items = data.article;
+
+        this.userFace = data.userFace;
+        this.customerNum = data.customerNum;
+        this.regNum = data.regNum;
+        this.payNum = data.payNum;
+        this.userTotal = data.userTotal;
+
+      },
+      userFaceAppear:function(){
+        this.userface_pos = 'absolute';
+        this.userface_top = 125;
+      },
+      userFaceDisappear:function(){
+        this.userface_pos = 'fixed';
+        this.userface_top = 7;
+      },
+
+    }
+  }
+</script>

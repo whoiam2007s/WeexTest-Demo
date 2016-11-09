@@ -1,0 +1,129 @@
+<template>
+  <div class="content">
+
+    <nav-bar is_back_show="{{true}}" title="系统消息" is_tixing_show="{{false}}" ></nav-bar>
+
+    <list style="top:89px;height:{{deviceHeight-89}}px">
+      <cell class="bar-20"></cell>
+
+      <cell repeat="{{items}}">
+        <sysmsg-item d-id="{{id}}" title="{{title}}" msg="{{msg}}" add-time="{{addTime}}" ></sysmsg-item>
+      </cell>
+
+    </list>
+
+    <confirm id="confirm" ></confirm>
+
+  </div>
+
+</template>
+
+<style>
+  .content{
+    background-color:#efeff4;
+  }
+  .bg-f{background-color:#FFF;}
+  .bar-20{margin-bottom:20px;}
+  .login-btn{
+    width:750px;
+    height:92px;
+    line-height:92px;
+    text-align:center;
+    font-size:36px;
+    margin-bottom:40px;
+  }
+
+</style>
+
+<script>
+  require('../common/nav-bar.we');
+  require('../common/sysmsg-item.we');
+  require('../modals/confirm.we');
+
+  var resource = require('../common/resource');
+  var baseURL='';
+
+  function getMsg(data, callback){
+    let rst = [];
+    for(let i=1; i<=10; i++){
+      rst.push({
+        id:i,
+        title:'消息标题+'+i,
+        msg:'消息内容+'+i,
+        addTime:'2016-11-04 12:01:20',
+      });
+    }
+    callback(rst);
+  }
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      icons:{
+        card:resource.icons.mine_card,
+        security:resource.icons.mine_security,
+        about:resource.icons.mine_about,
+        feedback:resource.icons.mine_feedback,
+      },
+      deviceHeight:1000,
+      maxId:0,
+      items:[],
+    },
+    created:function(){
+      let config = this.$getConfig();
+      baseURL = resource.getBaseUrl(config);
+      this.baseURL = baseURL;
+
+      let d_h = config.env.deviceHeight;
+      this.deviceHeight = d_h;
+
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+
+      let self = this;
+      let storage = require('@weex-module/storage');
+      storage.getItem('msg_max_id', function(e){
+        self.maxId = e.result && e.data ? e.data : 0;
+        self.getData();
+      });
+      this.$on('sysmsgItem.onDelClick', function(e){
+        let $confirm = this.$vm('confirm');
+        let self = this;
+        $confirm.show({
+          title:'注意',
+          content:'确定删除这条消息吗？',
+          callback:function(){
+            let id = e.detail.id;
+            self.msgDel(id);
+          }
+        })
+      });
+
+    },
+    methods: {
+      initData:function(data){
+        this.items = this.items.concat(data);
+      },
+      getData:function(){
+        let self = this;
+        getMsg({id:self.maxId}, function(data){
+          self.initData(data);
+          self.maxId -= 10;
+          self.maxId < 0 ? self.maxId = 0 : true;
+          if(data.length == 0){
+            self.getData();
+          }
+        });
+      },
+      msgDel:function(id){
+        for(let key in this.items){
+          if(this.items[key].id == id){
+            this.items.splice(key, 1);
+            return true;
+          }
+        }
+      },
+    }
+  }
+</script>

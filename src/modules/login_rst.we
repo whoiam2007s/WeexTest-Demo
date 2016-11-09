@@ -1,0 +1,62 @@
+<template>
+  <div class="content" >
+
+    <div style="position:absolute;top:0;right:0;left:0;bottom:0;width:750px;padding-left:80px;padding-right:80px;text-align:center;align-items:center;justify-content:center;">
+      <image style="width:134px;height:134px;" src="{{icons.suc}}"></image>
+      <text style="font-size:32px;color:#9cc3eb;padding-top:50px;margin-bottom:20px;">{{text}}</text>
+      <text style="font-size:24px;color:#596e84;">自动跳转中...</text>
+    </div>
+
+  </div>
+</template>
+
+<style>
+  .content{
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    background:#313842;
+  }
+</style>
+
+<script>
+
+  var resource = require('../common/resource');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      text:'',
+      url:'',
+      icons:{
+        suc:resource.icons.login_suc,
+      },
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for(let key in this.icons){
+        this.icons[key] = this.baseURL + this.icons[key];
+      }
+
+      let text = resource.getParameterByName('text', config.bundleUrl);
+      let url = resource.getParameterByName('url', config.bundleUrl);
+      this.text = text;
+      if(url){
+        this.url = resource.getPageUrl(config, url);
+      }
+    },
+    methods: {
+      ready:function(){
+        if(this.url){
+          let self = this;
+          setTimeout(function(){
+            self.$openURL(self.url);
+          }, 1000);
+        }
+      }
+    }
+  }
+</script>

@@ -1,0 +1,159 @@
+<template>
+  <div class="content" >
+
+    <login-nav title=""></login-nav>
+
+    <div style="position:absolute;top:0;right:0;left:0;bottom:0;width:750px;padding-top:89px;padding-left:80px;padding-right:80px;text-align:center;align-items:center;">
+
+      <image style="width:320px;height:86px;margin-top:144px;margin-bottom:68px;" src="{{icons.logo_2}}"></image>
+
+      <input-login id="phone" type="tel" kind="phone" placeholder="请输入手机号"></input-login>
+      <div>
+        <input-login id="code" type="tel" kind="phone" placeholder="验证码" right="{{is_send_msg?185:150;}}"></input-login>
+        <div style="position:absolute;top:0;right:0;height:102px;justify-content:center;">
+          <text onclick="sendCode" style="text-align:center;border:{{is_send_msg?0:1}}px solid #9cc3eb;font-size:22px;height:40px;line-height:40px;color:#9cc3eb;border-radius:3px;padding-left:10px;padding-right:10px;">{{is_send_msg?'验证码已发送...':'发送验证码'}}</text>
+        </div>
+      </div>
+      <input-login id="password" type="password" kind="lock" placeholder="请输入密码"></input-login>
+      <input-login id="password2" type="password" kind="lock" placeholder="确认密码"></input-login>
+
+
+      <text class="btn" onclick="onRegistClick">注册</text>
+      <text style="font-size:24px;color:#5a6d83;text-align:center;margin-top:25px;">注册即表示同意《康庄学车加盟商入驻协议》</text>
+
+      <text id="isCodeSend" style="margin-top:50px;font-size:24px;color:#FFF;opacity:0;background:#ff801a;line-height:55px;height:55px;width:220px;text-align:center;" >验证码已发送</text>
+
+      <a href="{{agreement_url}}" style="position:absolute;bottom:32px;flex-direction:row;justify-content:center;align-items:center;">
+        <text style="font-size:24px;color:#5a6d83;">了解康庄学车加盟政策</text>
+        <image style="width:22px;height:22px;margin-left:5px;" src="{{icons.arrow}}"></image>
+      </a>
+
+    </div>
+
+    <alert id="alert"></alert>
+
+  </div>
+</template>
+
+<style>
+  .content{
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:0;
+    background:#313842;
+  }
+  .btn{
+    font-size:28px;
+    width:590px;
+    height:92px;
+    line-height:92px;
+    color:#9cc3eb;
+    background:#2b2f38;
+    text-align:center;
+    margin-top:42px;
+  }
+</style>
+
+<script>
+  require('../common/login-nav.we');
+  require('../modals/input-login.we');
+  require('../modals/alert.we');
+
+  var resource = require('../common/resource');
+  var navigator = require('@weex-module/navigator');
+  var animation = require('@weex-module/animation');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      agreement_url:'#',
+      is_send_msg:false,
+      icons:{
+        logo_2:resource.images.login_logo_2,
+        arrow:resource.icons.login_arrow,
+      },
+
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for(let key in this.icons){
+        this.icons[key] = this.baseURL + this.icons[key];
+      }
+
+      this.$on('loginNav.onBackClick', function(e){
+        e.stop();
+        let params = {
+          animated:true,
+        };
+        navigator.pop(params);
+      });
+    },
+    methods: {
+      sendCode:function(){
+        if(this.is_send_msg){return true;}
+        this.is_send_msg = true;
+        let self = this;
+        setTimeout(function(){
+          self.is_send_msg = false;
+        }, 60000);
+        let $el = this.$el('isCodeSend');
+        animation.transition($el,{
+          styles:{opacity:1},
+          duration: 500,
+          timingFunction: 'ease',
+        },function(){
+            setTimeout(function(){
+              animation.transition($el,{
+                styles:{opacity:0},
+                duration: 500,
+                timingFunction: 'ease',
+              });
+            }, 2000);
+          });
+      },
+      onRegistClick:function(){
+        let phone = this.$vm('phone').val;
+        let code = this.$vm('code').val;
+        let password = this.$vm('password').val;
+        let password2 = this.$vm('password2').val;
+        let $alert = this.$vm('alert');
+        if(!resource.isPhone(phone)){
+          $alert.show({
+            content: '请填写正确的手机号码',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!code || code != '123456'){
+          $alert.show({
+            content: '请填写正确的验证码',
+            title: '提示'
+          });
+          return false;
+        }
+        if(!password || !password2){
+          $alert.show({
+            content: '请填写密码并确认',
+            title: '提示'
+          });
+          return false;
+        }
+
+        if(password != password2){
+          $alert.show({
+            content: '请确保两次密码一致',
+            title: '提示'
+          });
+          return false;
+        }
+
+        let url = resource.getPageUrl(this.$getConfig(), 'modules/regist_base_1.js');
+        this.$openURL(url);
+
+      },
+    }
+  }
+</script>

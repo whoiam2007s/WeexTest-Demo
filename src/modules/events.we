@@ -1,0 +1,82 @@
+<template>
+  <div class="content">
+
+    <nav-bar is_back_show="{{true}}" title="活动宣传" is_tixing_show="{{true}}" ></nav-bar>
+
+    <list style="top:89px;height:{{deviceHeight-89}}px">
+      <cell repeat="{{items}}">
+        <event-item activity-id="{{activityId}}" title="{{title}}" src="{{image}}" ></event-item>
+      </cell>
+
+    </list>
+
+    <confirm id="confirm" ></confirm>
+
+  </div>
+
+</template>
+
+<style>
+  .content{
+    background-color:#efeff4;
+  }
+  .bg-f{background-color:#FFF;}
+  .bar-20{margin-bottom:20px;}
+  .login-btn{
+    width:750px;
+    height:92px;
+    line-height:92px;
+    text-align:center;
+    font-size:36px;
+    margin-bottom:40px;
+  }
+
+</style>
+
+<script>
+  require('../common/nav-bar.we');
+  require('../common/event-item.we');
+  require('../modals/confirm.we');
+
+  var resource = require('../common/resource');
+  var baseURL='';
+
+  function getInfo(callback){
+    let rst = [];
+    for(let i=1; i<=10; i++){
+      rst.push({
+        activityId:i%2+1,
+        image:baseURL+resource.temp.event_1,
+        title:'活动标题'+i,
+      });
+    }
+    callback(rst);
+  }
+
+  module.exports = {
+    data: {
+      deviceHeight:1000,
+      items:[],
+    },
+    created:function(){
+      let config = this.$getConfig();
+      baseURL = resource.getBaseUrl(config);
+
+      let d_h = config.env.deviceHeight;
+      this.deviceHeight = d_h;
+
+      this.getData();
+    },
+    methods: {
+      initData:function(data){
+        this.items = this.items.concat(data);
+      },
+      getData:function(){
+        let self = this;
+        getInfo(function(data){
+          self.initData(data);
+        });
+      }
+    }
+  }
+</script>

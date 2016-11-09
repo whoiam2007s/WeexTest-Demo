@@ -1,0 +1,68 @@
+<template>
+  <div class="content">
+    <image style="position:absolute;left:0;top:0;width:750px;height:548px;z-index:1;" src="{{icons.bg}}"></image>
+    <div style="z-index:2;align-items:center;">
+      <image style="width:180px;height:180px;margin-top:180px;margin-bottom:20px;border-radius:90px;border:4px solid rgba(255,255,255,.2);" src="{{src}}"></image>
+      <text if="{{is_login}}" style="font-size:32px;color:#FFF;line-height:46px;height:46px;margin-bottom:10px;text-align:center;">{{nickname}}</text>
+      <text if="{{is_login}}" style="font-size:22px;color:#FFF;line-height:50px;height:50px;width:180px;border:1px solid #7abeec;text-align:center;" url="" onclick="onLinkClick">编辑资料</text>
+      <text if="{{!is_login}}" style="font-size:32px;color:#FFF;line-height:46px;height:46px;border-bottom:1px solid #FFF;" onclick="onLoginClick">请点击登陆</text>
+    </div>
+    <alert id="alert"></alert>
+  </div>
+</template>
+
+<style>
+  .content{
+    height:548px;
+  }
+</style>
+
+<script>
+  require('../modals/alert.we');
+  var resource = require('../common/resource');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      src:'',
+      nickname:'',
+      state:0,
+      is_login:true,
+      icons:{
+        bg:resource.images.mine_bg,
+      },
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+
+    },
+    methods: {
+      onLinkClick:function(e){
+        if(!this.is_login){
+          let $alert = this.$vm('alert');
+          $alert.show({
+            title:'提示',
+            content:'请先登录'
+          });
+          return false;
+        }
+        let url = e.target.attr.url;
+        if(!url){return true;}
+        let params = {
+          url:resource.getBaseUrl(this.$getConfig(), url),
+          animated:true,
+        };
+        navigator.push(params);
+      },
+      onLoginClick:function(){
+        let url = resource.getPageUrl(this.$getConfig(), 'modules/login_page.js');
+        this.$openURL(url);
+      }
+    }
+  }
+</script>

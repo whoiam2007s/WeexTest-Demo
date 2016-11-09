@@ -1,0 +1,78 @@
+<template>
+  <div class="content">
+    <tabbar-main class="tabbar" selected-color="#1d8fe1" unselected-color="#999999" tab-items="{{tab_items}}"></tabbar-main>
+  </div>
+</template>
+
+<style>
+  .content{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    background-color:#efeff4;
+  }
+</style>
+
+<script>
+  require('../common/tabbar-main.we');
+
+  var resource = require('../common/resource');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      tab_items:[
+        {
+          index:0,
+          title:"意向列表",
+          titleColor:"#999",
+          icon:"",
+          image: resource.icons.bottombar_yixiang,
+          selectedImage:resource.icons.bottombar_yixiang_selected,
+          src:"modules/intent.js",
+          visibility:"visible"
+        },
+        {
+          index:1,
+          title:"工作",
+          titleColor:"#999",
+          icon:"",
+          image:resource.icons.bottombar_work,
+          selectedImage:resource.icons.bottombar_work_selected,
+          src:"modules/work.js",
+          visibility:"visible"
+        },
+        {
+          index:2,
+          title:"我的",
+          titleColor:"#999",
+          icon:"",
+          image:resource.icons.bottombar_wode,
+          selectedImage:resource.icons.bottombar_wode_selected,
+          src:"modules/mine.js",
+          visibility:"visible"
+        }
+      ]
+    },
+    methods:{
+      initPath:function(){
+        for(let i=0; i<this.tab_items.length; i++){
+          this.tab_items[i].image = this.baseURL + this.tab_items[i].image;
+          this.tab_items[i].selectedImage = this.baseURL + this.tab_items[i].selectedImage;
+          this.tab_items[i].src = this.baseURL + this.tab_items[i].src;
+        }
+      }
+    },
+    created:function(){
+      this.baseURL = resource.getBaseUrl(this.$getConfig());
+      this.initPath();
+
+    }
+  }
+</script>
+
+
+
+

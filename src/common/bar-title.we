@@ -1,0 +1,23 @@
+<template>
+  <div style="padding:30px;height:110px;flex-direction:row;align-items:center;">
+    <image if="{{is_icon}}" src="{{icon_src}}" style="width:36px;height:36px;margin-right:15px;"></image>
+    <text style="font-size:32px;line-height:36px;color:#333;font-weight:bold;">{{title}}</text>
+    <div if="is_line" style="position:absolute;bottom:0;left:30px;height:1px;width:690px;background:#eee;"></div>
+  </div>
+</template>
+
+<style>
+
+</style>
+
+<script>
+  module.exports = {
+    data: {
+      is_icon:true,
+      is_line:false,
+      icon_src:'',
+      title:'标题'
+    },
+    methods: {}
+  }
+</script>

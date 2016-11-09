@@ -1,0 +1,53 @@
+<template>
+  <div class="content">
+    <div style="width:690px;flex-direction:row;justify-content:space-between;align-items:center;">
+      <text style="font-size:30px;color:#333;line-height:50px;padding-top:10px;padding-bottom:10px;margin-right:20px;">{{title}}</text>
+      <div style="flex-direction:row;align-items:flex-end;;padding-right:30px;">
+        <text style="font-size:18px;color:#c8c8c8;margin-right:10px;">{{addTime}}</text>
+        <image style="width:26px;height:26px;" src="{{icons.del}}" onclick="onDelClick"></image>
+      </div>
+    </div>
+    <text style="font-size:24px;line-height:32px;color:#999;width:690px;">{{msg}}</text>
+    <div style="background-color:#eee;height:1px;width:690px;margin-top:20px;"></div>
+  </div>
+</template>
+
+<style>
+  .content{
+    align-items:flex-end;
+    background-color:#FFF;
+    padding-top:20px;
+  }
+</style>
+
+<script>
+  var resource = require('../common/resource');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      dId:'',
+      title:'',
+      addTime:'',
+      msg:'',
+      icons:{
+        del:resource.icons.apply_delete,
+      }
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+    },
+    methods: {
+      onDelClick:function(){
+        let params = {
+          id:this.dId,
+        };
+        this.$dispatch('sysmsgItem.onDelClick', params);
+      }
+    }
+  }
+</script>

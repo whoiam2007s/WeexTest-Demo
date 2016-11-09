@@ -1,0 +1,149 @@
+<template>
+  <div class="content">
+
+    <nav-bar is_back_show="{{false}}" title="我的" is_tixing_show="{{true}}" background-color="rgba(0,0,0,0)" ></nav-bar>
+
+    <div>
+      <mine-card nickname="{{nickName}}" src="{{face}}" is_login="{{is_login}}"></mine-card>
+
+      <div class="bg-f">
+        <bar-title title="绑定银行卡" is_line="{{true}}" is_icon="{{true}}" icon_src="{{icons.card}}" url="" onclick="onLinkClick"></bar-title>
+        <bar-title title="账号安全" is_line="{{true}}" is_icon="{{true}}" icon_src="{{icons.security}}" url="" onclick="onLinkClick"></bar-title>
+        <bar-title title="关于康庄" is_line="{{true}}" is_icon="{{true}}" icon_src="{{icons.about}}" url="" onclick="onLinkClick"></bar-title>
+        <bar-title title="意见反馈" is_line="{{false}}" is_icon="{{true}}" icon_src="{{icons.feedback}}" url="" onclick="onLinkClick"></bar-title>
+      </div>
+
+      <div class="bar-20"></div>
+
+      <text class="login-btn bg-f" style="color:{{!is_login?'#1d8fe1':'#e94e4e'}}" url="" onclick="onLoginClick" >{{is_login?'退出登录':'登录'}}</text>
+
+      <div style="height:98px;"></div>
+
+    </div>
+
+    <confirm id="confirm" ></confirm>
+    <alert id="alert"></alert>
+
+  </div>
+
+</template>
+
+<style>
+  .content{
+    background-color:#efeff4;
+  }
+  .bg-f{background-color:#FFF;}
+  .bar-20{margin-bottom:20px;}
+  .login-btn{
+    width:750px;
+    height:92px;
+    line-height:92px;
+    text-align:center;
+    font-size:36px;
+    margin-bottom:40px;
+  }
+
+</style>
+
+<script>
+  require('../common/nav-bar.we');
+  require('../common/mine-card.we');
+  require('../common/bar-title.we');
+  require('../modals/alert.we');
+  require('../modals/confirm.we');
+
+  var resource = require('../common/resource');
+  var navigator = require('@weex-module/navigator');
+  var baseURL='';
+
+  function getInfo(data, callback){
+    callback({
+      nickName:'用户姓名',
+      face:baseURL+resource.temp.head_1,
+      state:Math.round(Math.random()),
+    });
+  }
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      icons:{
+        card:resource.icons.mine_card,
+        security:resource.icons.mine_security,
+        about:resource.icons.mine_about,
+        feedback:resource.icons.mine_feedback,
+      },
+      nickName:'',
+      face:'',
+      state:0,
+      is_login:false,
+    },
+    created:function(){
+      let config = this.$getConfig();
+      baseURL = resource.getBaseUrl(config);
+      this.baseURL = baseURL;
+
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+
+      this.getData(0);
+
+      let self = this;
+      let storage = require('@weex-module/storage');
+      storage.getItem('is_user_login', function(e){
+        self.is_login = e.result && e.data != 'undefined' ? (e.data == 1 ? true : false) : false;
+      });
+
+    },
+    methods: {
+      initData:function(index, data){
+        this.nickName = data.nickName;
+        this.face = data.face;
+        this.state = data.state;
+      },
+      getData:function(index){
+        let self = this;
+        getInfo({}, function(data){
+          self.initData(index, data);
+        });
+      },
+      onLinkClick:function(e){
+        if(!this.is_login){
+          let $alert = this.$vm('alert');
+          $alert.show({
+            title:'提示',
+            content:'请先登录'
+          });
+          return false;
+        }
+        let url = e.target.attr.url;
+        if(!url){return true;}
+        let params = {
+          url:resource.getBaseUrl(this.$getConfig(), url),
+          animated:true,
+        };
+        navigator.push(params);
+      },
+      onLoginClick:function(e){
+        if(this.is_login){
+          let $confirm = this.$vm('confirm');
+          let self = this;
+          $confirm.show({
+            title:'注意',
+            content:'确定退出登陆吗？',
+            callback:function(){
+              let storage = require('@weex-module/storage');
+              storage.setItem('is_user_login', '0', function(){
+                self.$openURL('');
+              });
+            }
+          })
+        }else {
+          let url = resource.getPageUrl(this.$getConfig(), 'modules/login_page.js');
+          this.$openURL(url);
+        }
+      }
+    }
+  }
+</script>

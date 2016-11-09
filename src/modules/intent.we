@@ -1,0 +1,234 @@
+<template>
+  <div class="content">
+
+    <nav-bar is_back_show="{{false}}" title="意向列表" is_tixing_show="{{true}}" ></nav-bar>
+
+    <scroller style="height:{{deviceHeight}}px;">
+
+      <div style="height:89px;"></div>
+
+      <div class="bg-f bar-20" style="padding-top:40px">
+        <intent-top-num num="{{customerNumToday}}" unit="人" title="今日新增" total="{{customerNum}}" sign="{{regNum}}"></intent-top-num>
+        <div style="position:absolute;top:20px;right:30px;align-items:flex-end;">
+          <div style="width:50px;height:50px;" onclick="onHelpClick">
+            <image style="width:46px;height:46px;" src="{{icons.help}}"></image>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <tabbar-blks items="{{items}}"></tabbar-blks>
+
+        <div class="" if="{{blks_selectedIndex == 0}}">
+          <div if="items[0].customer.length > 0 " style="font-size:22px;color:#666;flex-direction:row;justify-content:center;align-items:center;height:60px;background:#f6f9fb;">
+            <text>您还有</text>
+            <text style="color:#1d8fe1;">{{items[0].customer.length}}</text>
+            <text>个意向学员未跟进，加油哦！</text>
+          </div>
+
+          <list-empty if="{{items[0].customer.length == 0}}" title="离成功获得报名，只差一小步"></list-empty>
+
+          <intent-list-item repeat="{{items[0].customer}}" type="0" id="items_0_{{$index}}" customerId="{{customerId}}" userId="{{userId}}" userName="{{userName}}" userFace="{{userFace}}" userTel="{{userTel}}" addTime="{{addTime}}" ></intent-list-item>
+
+        </div>
+
+        <div class="" if="{{blks_selectedIndex == 1}}">
+
+          <list-empty if="{{items[1].customer.length == 0}}" title="离成功获得报名，只差一小步"></list-empty>
+
+          <intent-list-item repeat="{{items[1].customer}}" type="1" id="items_1_{{$index}}" customerId="{{customerId}}" userId="{{userId}}" userName="{{userName}}" userFace="{{userFace}}" userTel="{{userTel}}" addTime="{{addTime}}" ></intent-list-item>
+
+        </div>
+      </div>
+
+      <div style="height:98px;"></div>
+
+    </scroller>
+
+    <intent-del-confirm id="del_confirm" ></intent-del-confirm>
+
+    <confirm id="confirm" ></confirm>
+    <alert id="alert"></alert>
+
+  </div>
+
+</template>
+
+<style>
+  .content{
+    background-color:#efeff4;
+  }
+  .bg-f{background:#FFF;}
+  .bar-20{margin-bottom:20px;}
+
+</style>
+
+<script>
+  require('../common/nav-bar.we');
+  require('../common/intent-top-num.we');
+  require('../common/tabbar-blks.we');
+  require('../common/list-empty.we');
+  require('../common/intent-list-item.we');
+  require('../common/intent-del-confirm.we');
+  require('../modals/alert.we');
+  require('../modals/confirm.we');
+
+  var resource = require('../common/resource');
+  var baseURL='';
+
+  function getInfo(data, callback){
+    callback({
+      customerNumToday:'45',
+      customerNum:'123',
+      regNum:'53',
+      customer:[
+        {customerId:'1',userId:'1',userName:'用户名称',userFace:baseURL+resource.temp.head_1,userTel:'15855790731',addTime:'2016-05-16 12:35:02'},
+        {customerId:'2',userId:'0',userName:'用户名称',userFace:baseURL+resource.temp.head_1,userTel:'15855790731',addTime:'2016-05-16 12:35:02'},
+        {customerId:'3',userId:'2',userName:'用户名称',userFace:baseURL+resource.temp.head_1,userTel:'15855790731',addTime:'2016-05-16 12:35:02'},
+        {customerId:'4',userId:'3',userName:'用户名称',userFace:baseURL+resource.temp.head_1,userTel:'15855790731',addTime:'2016-05-16 12:35:02'},
+        {customerId:'5',userId:'4',userName:'用户名称',userFace:baseURL+resource.temp.head_1,userTel:'15855790731',addTime:'2016-05-16 12:35:02'},
+       ]
+    });
+  }
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      icons:{
+        help:resource.icons.intent_help,
+      },
+      items:[
+        {
+          index:0,
+          title:'新意向',
+          color:'',
+          shadowColor:'',
+          customer:[],
+        },
+        {
+          index:1,
+          title:'跟进中',
+          color:'',
+          shadowColor:'',
+          customer:[],
+        },
+      ],
+      pages:[0, 0],
+      page_size:5,
+      deviceHeight:1000,
+      customerNumToday:56,
+      customerNum:239,
+      regNum:521,
+      blks_selectedIndex:0,
+    },
+    created:function(){
+      let self = this;
+      let config = this.$getConfig();
+      baseURL = resource.getBaseUrl(config);
+      this.baseURL = baseURL;
+
+      let d_h = config.env.deviceHeight;
+      this.deviceHeight = d_h;
+
+      for (let key in this.icons){
+        this.icons[key] = this.baseURL+this.icons[key];
+      }
+
+      this.getData(0);
+      this.getData(1);
+
+      this.$on('tabbarBlks.onItemClick', function(e){
+        this.blks_selectedIndex = e.detail.index;
+      });
+      this.$on('listItem.onDelClick', function(e){
+        let self = this;
+        let customerId= e.detail.customerId;
+        let type = e.detail.type;
+        if(type == 0){
+          let confirm = this.$vm('del_confirm');
+          confirm.show({
+            callback:function(data){
+              console.log('this will del customerId : '+ customerId);
+              self.refreshList(type, customerId);
+
+              let alert = self.$vm('alert');
+              alert.show({
+                content:'删除成功！',
+                title:'提示',
+              });
+            }
+          });
+        }else{
+          let confirm = this.$vm('confirm');
+          confirm.show({
+            title:'提示',
+            content:'确定要删除这个用户吗？',
+            callback:function(data){
+              console.log('this will del customerId : '+ customerId);
+              self.refreshList(type, customerId);
+
+              let alert = self.$vm('alert');
+              alert.show({
+                content:'删除成功！',
+                title:'提示',
+              });
+            }
+          });
+        }
+      });
+      this.$on('listItem.onDelFlagChange', function(e){
+        let customerId= e.detail.customerId;
+        for (let key in this.items[0].customer){
+          let $vm = this.$vm('items_0_'+key);
+          if($vm && $vm.customerId != customerId && $vm.del_flag){
+            $vm.backToInit();
+          }
+        }
+        for (let key in this.items[1].customer){
+          let $vm = this.$vm('items_1_'+key);
+          if($vm && $vm.customerId != customerId && $vm.del_flag){
+            $vm.backToInit();
+          }
+        }
+      });
+
+    },
+    methods: {
+      initData:function(index, data){
+        this.customerNumToday = data.customerNumToday;
+        this.customerNum = data.customerNum;
+        this.regNum = data.regNum;
+        this.items[index].customer = data.customer;
+      },
+      getData:function(index){
+        let self = this;
+        let state = 0;
+        if(index == 1){
+          state = 2;
+        }
+        getInfo({
+          state:state,
+          page:this.pages[index]++,
+          page_size:this.page_size,
+        }, function(data){
+          self.initData(index, data);
+        });
+      },
+      onHelpClick:function(e){
+        let alert = this.$vm('alert');
+        alert.show({
+          title:'意向列表说明',
+          content:'意向学车用户在您分享的微名片或活动界面填写报名意向后，您可在这里查看意向学员信息，并进行跟进。编辑备注后，该学员信息转入“跟进中”。',
+        });
+      },
+      refreshList:function(type, customerId){
+        let list = this.items[type].customer;
+        for(let i=0; i<list.length; i++){
+          if(list[i].customerId == customerId){
+            list.splice(i, 1);return true;
+          }
+        }
+      }
+    }
+  }
+</script>

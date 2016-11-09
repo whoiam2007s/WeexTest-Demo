@@ -1,0 +1,109 @@
+<template>
+  <div class="content">
+    <image style="position:absolute;top:34px;left:0;width:34px;height:34px;margin-right:40px;" src="{{icon_kind}}"></image>
+    <input id="input" class="input" type="{{type}}" style="padding-right:{{right+80}}px;" value="{{value}}" placeholder="{{placeholder}}" oninput="onInput" onfocus="onFocus" onblur="onBlur" ></input>
+    <image style="position:absolute;top:37px;right:{{is_pw?right+52:right}}px;width:28px;height:28px;opacity:{{is_clear_show?1:0}};" src="{{icon_clear}}" onclick="onClearClick"></image>
+    <image style="position:absolute;top:35px;right:{{right}}px;width:32px;height:32px;" src="{{icon_eye}}" if="is_pw" onclick="onShowToggle"></image>
+  </div>
+</template>
+
+<style>
+  .content{
+    flex-direction:row;
+    border-bottom:1px solid #475464;
+    height:102px;
+    width:590px;
+    justify-content:flex-start;
+    align-items:center;
+  }
+  .input{
+    font-size:28px;
+    color:#9cc3eb;
+    placeholder-color:#5a6d83;
+    background:rgba(0,0,0,0);
+    border:0;
+    width:590px;
+    padding-left:75px;
+    /*padding-right:80px;*/
+    outline:0;
+  }
+
+</style>
+
+<script>
+  var resource = require('../common/resource');
+  module.exports = {
+    data: {
+      type:'text',
+      kind:'phone',
+      value:'',
+      val:'',
+      right:0,
+      placeholder:'',
+      baseURL:'',
+      icon_kind:'',
+      icon_clear:'',
+      icon_eye:'',
+      is_pw:false,
+      is_clear_show:false,
+      icons:{
+        phone:resource.icons.input_phone,
+        grade:resource.icons.input_grade,
+        lock:resource.icons.input_lock,
+        home:resource.icons.input_home,
+        location:resource.icons.input_location,
+        man:resource.icons.input_man,
+        message:resource.icons.input_message,
+        book:resource.icons.input_book,
+        eye_close:resource.icons.input_eye_close,
+        eye_open:resource.icons.input_eye_open,
+        clear:resource.icons.input_clear,
+      }
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      for(let key in this.icons){
+        this.icons[key] = this.baseURL + this.icons[key];
+      }
+      this.icon_kind = this.icons[this.kind];
+      this.icon_clear = this.icons.clear;
+      this.icon_eye = this.icons.eye_close;
+      if(this.type == 'password'){
+        this.is_pw = true;
+      }
+    },
+    methods: {
+      onInput:function(e){
+        let val = e.target.attr.value;
+        this.value = val;
+        this.val = val;
+        if(val != ''){
+          this.is_clear_show = true;
+        }
+      },
+      onFocus:function(){
+        if(this.value != ''){
+          this.is_clear_show = true;
+        }
+      },
+      onBlur:function(e){
+        this.is_clear_show = false;
+      },
+      onClearClick:function(){
+        this.value = '';
+        this.val = '';
+        this.is_clear_show = false;
+      },
+      onShowToggle:function(){
+        if(this.type == 'password'){
+          this.type = 'text';
+          this.icon_eye = this.icons.eye_open;
+        }else{
+          this.type = 'password';
+          this.icon_eye = this.icons.eye_close;
+        }
+      }
+    }
+  }
+</script>

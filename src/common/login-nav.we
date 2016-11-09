@@ -1,0 +1,52 @@
+<template>
+  <div class="nav-bar">
+    <div style="flex:.5;" class="nav-back">
+      <image style="width:36px;height:36px;margin-left:25px;" src="{{icon_back}}" onclick="onBackClick"></image>
+    </div>
+    <div style="flex:1;align-items:center;justify-content:center">
+      <text style="font-size:36px;color:#9cc3eb;text-align:center;">{{title}}</text>
+    </div>
+    <div style="flex:.5;"></div>
+  </div>
+</template>
+
+<style>
+  .nav-bar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:750px;
+    height:88px;
+    flex-direction:row;
+    border-bottom:1px solid #475464;
+    background-color:#323842;
+    z-index:99;
+  }
+  .nav-back{
+    align-items:center;
+    justify-content:flex-start;
+    flex-direction:row;
+  }
+</style>
+
+<script>
+  var resource = require('../common/resource');
+
+  module.exports = {
+    data: {
+      baseURL:'',
+      title:'',
+      icon_back:resource.icons.login_back,
+    },
+    created:function(){
+      let config = this.$getConfig();
+      this.baseURL = resource.getBaseUrl(config);
+      this.icon_back = this.baseURL + this.icon_back;
+    },
+    methods: {
+      onBackClick:function(){
+        this.$dispatch('loginNav.onBackClick', {});
+      },
+    }
+  }
+</script>

@@ -1,0 +1,40 @@
+<template>
+  <div style="flex-direction:row;height:240px;align-items:center;justify-content:space-between;border-top:1px solid #eee;" url="{{url}}" onclick="onItemClick" >
+    <div style="width:500px;justify-content:flex-start;">
+      <text style="font-size:32px;color:#333;font-weight:bold;width:500px;height:100px;line-height:46px;text-overflow:ellipsis;lines:2">{{title}}</text>
+      <text style="font-size:30px;color:#999;width:500px;height:60px;text-overflow:ellipsis;lines:1">{{description}}</text>
+      <text if="{{type==2}}" style="width:60px;height:32px;justify-content:center;align-items:center;font-size:22px;color:#FFF;background:#ff801a;">视频</text>
+      <text if="{{type==1}}" style="width:60px;height:32px;justify-content:center;align-items:center;font-size:22px;color:#FFF;background:#1d8fe1;">文章</text>
+      <text if="{{type==3}}" style="width:60px;height:32px;justify-content:center;align-items:center;font-size:22px;color:#FFF;background:#1d8fe1;">图片</text>
+    </div>
+    <div style="width:150px;">
+      <image style="width:150px;height:150px;" src="{{src}}"></image>
+      <text style="padding-top:15px;font-size:22px;color:#999;height:32px;text-align:right;">{{time}}</text>
+    </div>
+  </div>
+</template>
+
+<style>
+
+</style>
+
+<script>
+  module.exports = {
+    data: {
+      type:1,//2-视频，1-文章，3-图片
+      title:'',
+      description:'',
+      time:'',
+      src:'',
+      url:'',
+    },
+    methods: {
+      onItemClick:function(e){
+        let params = {
+          url: e.target.attr.url,
+        };
+        this.$dispatch('onArticleItemClick', params);
+      }
+    }
+  }
+</script>
